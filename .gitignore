@@ -1,6 +1,11 @@
 .vscode
-version_2/asdf.dSYM
-version_2/asdf.dSYM
+
+version_2/asdf.dSYM/
+version_2/asdf.dSYM/
+
 version_2/asdf
 version_2/asdf.cpp
+
 version_2/prueba.cpp
+
+version_2/tenis_2
