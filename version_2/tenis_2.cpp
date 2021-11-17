@@ -1,11 +1,7 @@
 #include <iostream>
 #include <ctime>
-#include <chrono>
-#include <thread>
 
 using namespace std;
-using namespace std::this_thread;
-using namespace std::chrono;
 
 const int ANCHO_PISTA = 7;
 const int LARGO_PISTA = 3;
@@ -66,7 +62,6 @@ void pintar_fila_fondo(int ancho_pista){
     cout << " ";
     for(int i = 0; i < ANCHO_PISTA; i++){
         cout << " -";
-        sleep_for(nanoseconds(TIEMPO_DELAY_CORTO));
     }
     cout << endl;
 }
@@ -91,7 +86,6 @@ void pintar_campo(int ancho_pista, int largo_pista, int pos_bola, t_tenista teni
         cout << " ";
         for(int j = 1; j <= ancho_pista; j++){
             cout << "| ";
-            sleep_for(nanoseconds(TIEMPO_DELAY_CORTO));
             if(pos_bola == j) cout << "\b" << bola;
         }
         cout << "|" << endl;
@@ -101,14 +95,14 @@ void pintar_fila_medio(int ancho_pista){
     cout << "-";
     for(int i = 1; i <= ancho_pista; i++) {
         cout << "-" << i;
-        sleep_for(nanoseconds(TIEMPO_DELAY_CORTO));}
+        }
     cout << "--" << endl;
 }
 void pintar_inciales(string iniciales, int pos_tenista){
     cout << " ";
     for(int i = 1; i < pos_tenista; i++) {
         cout << "  ";
-        sleep_for(nanoseconds(TIEMPO_DELAY_CORTO));}
+        }
     cout << iniciales << endl;
 }
 

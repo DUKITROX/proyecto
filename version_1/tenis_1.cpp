@@ -23,8 +23,8 @@ const int NEGRO_MUY_CLARO = 246;
 const int NEGRO_CLARO = 241;
 const int NEGRO_OSCURO = 238;
 
-const int TIEMPO_DELAY_LARGO = 10000000;
-const int TIEMPO_DELAY_CORTO = 1000000;
+const int TIEMPO_DELAY_LARGO = 100000000;
+const int TIEMPO_DELAY_CORTO = 10000000;
 
 int introducir_dato(string dato, int min, int max);
 string marcador(int puntuacion);
