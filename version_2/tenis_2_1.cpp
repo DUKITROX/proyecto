@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const bool DEBUG_MODE = true, JUEGO_ALEATORIO = true;
+const bool DEBUG_MODE = true, JUEGO_ALEATORIO = false;;
 const int ANCHO_PISTA = 7, MIN_HABILIDAD = 1, MAX_HABILIDAD = 3, MIN_VELOCIDAD = 1, MAX_VELOCIDAD = 5;
 const int LARGO_PISTA = 3, JUEGOS_SET = 3;
 
@@ -31,7 +31,7 @@ int main(){
     string nombre1, nombre2, ganador_punto;
     t_puntos_juego puntos1 = nada, puntos2 = nada;
     int habilidad1, habilidad2, velocidad1, velocidad2, juegos1 = 0, juegos2 = 0;
-    t_tenista ganador, turno;
+    t_tenista ganador = nadie, turno;
     t_tenista jugador1 = tenista1;
     t_tenista jugador2 = tenista2;
 
@@ -56,9 +56,8 @@ int main(){
     //Juego
     //ganador = juego(nombre1, nombre2, velocidad1, velocidad2, habilidad1, habilidad2, puntos1, puntos2);
     //cout << ganador << endl;
-    
+     turno = saqueInicial();
     while(ganador == nadie){
-        turno = saqueInicial();
         pintar_marcador(nombre1, nombre2, puntos1, puntos2, juegos1, juegos2, turno);
         if(puntos1 > cuarenta && puntos2 < cuarenta){
             cout << "El ganador del juego es " << nombre1 << "!!" << endl;
@@ -125,6 +124,13 @@ void punto(t_puntos_juego &puntos){
     int i = int(puntos);
     i++;
     puntos = t_puntos_juego(i);
+}
+
+void cambioTurno(t_tenista &turno){
+    if(turno == tenista1)
+        turno = tenista2;
+    else
+        turno = tenista1;
 }
 
 string marcador(int puntuacion)
@@ -305,12 +311,16 @@ int golpeoBola(int posicion_tenista, int habilidad){
 }
 
 t_tenista saqueInicial(){
-    int i = rand()%2;
+    int i;
     t_tenista saque;
+
+    i = rand()%2;
+
     if(i == 0)
         saque = tenista1;
     else
         saque = tenista2;
+
     return saque;
 }
 
