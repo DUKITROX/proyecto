@@ -56,7 +56,7 @@ int main(){
     //Juego
     //ganador = juego(nombre1, nombre2, velocidad1, velocidad2, habilidad1, habilidad2, puntos1, puntos2);
     //cout << ganador << endl;
-     turno = saqueInicial();
+    turno = saqueInicial();
     while(ganador == nadie){
         pintar_marcador(nombre1, nombre2, puntos1, puntos2, juegos1, juegos2, turno);
         if(puntos1 > cuarenta && puntos2 < cuarenta){
