@@ -19,6 +19,8 @@ void pintar_peloteo(string nombre1, string nombre2, int pos_t1, int pos_t2, t_te
 void pintar_campo(int ancho_pista, int largo_pista, int pos_bola, t_tenista tenista);
 
 int main(){
+    int n = 1;
+    int c = 2;
     pintar_peloteo("ASD", "FNG", 1, 7, tenista1, 3);
     return 0;
 }
