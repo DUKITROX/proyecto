@@ -9,7 +9,7 @@ const int ANCHO_PISTA = 7, MIN_HABILIDAD = 1, MAX_HABILIDAD = 3, MIN_VELOCIDAD =
 const int LARGO_PISTA = 3, JUEGOS_SET = 3;
 
 
-typedef enum {nadie, tenista1, tenista2} t_tenista;
+typedef enum {NADIE, tenista1, tenista2} t_tenista;
 typedef enum {nada , quince, treinta, cuarenta, ventaja, aux} t_puntos_juego;
 
 string marcador(int puntuacion);
@@ -31,7 +31,7 @@ int main(){
     string nombre1, nombre2, ganador_punto;
     t_puntos_juego puntos1 = nada, puntos2 = nada;
     int habilidad1, habilidad2, velocidad1, velocidad2, juegos1 = 0, juegos2 = 0;
-    t_tenista ganador = nadie, turno;
+    t_tenista ganador = NADIE, turno;
     t_tenista jugador1 = tenista1;
     t_tenista jugador2 = tenista2;
 
@@ -57,7 +57,7 @@ int main(){
     //ganador = juego(nombre1, nombre2, velocidad1, velocidad2, habilidad1, habilidad2, puntos1, puntos2);
     //cout << ganador << endl;
     turno = saqueInicial();
-    while(ganador == nadie){
+    while(ganador == NADIE){
         pintar_marcador(nombre1, nombre2, puntos1, puntos2, juegos1, juegos2, turno);
         if(puntos1 > cuarenta && puntos2 < cuarenta){
             cout << "El ganador del juego es " << nombre1 << "!!" << endl;
@@ -89,11 +89,11 @@ int main(){
 }
 
 t_tenista juego(string nombre1, string nombre2, int velocidad1, int velocidad2, int habilidad1, int habilidad2, t_puntos_juego &puntos1, t_puntos_juego &puntos2, t_tenista turno){
-    t_tenista ganador_punto = nadie;
+    t_tenista ganador_punto = NADIE;
     int pos1 = 4, pos2 = 4, pos_bola = 4;
     t_puntos_juego punt1 = nada, punt2 = nada;
 
-        while(ganador_punto == nadie){
+        while(ganador_punto == NADIE){
             pintar_peloteo(nombre1, nombre2, pos1, pos2, turno, pos_bola);
             if(turno == tenista1){
                 cout << "Turno para " << nombre1 << endl;
@@ -197,8 +197,8 @@ void pintar_fila_medio(int ancho_pista){
 
 void pintar_peloteo(string nombre1, string nombre2, int pos_t1, int pos_t2, t_tenista bola_jugador, int pos_bola){
     t_tenista tenista1 = tenista1, tenista2 = tenista2;
-    if(bola_jugador == tenista1) tenista2 = nadie;
-    else if(bola_jugador == tenista2) tenista1 = nadie;
+    if(bola_jugador == tenista1) tenista2 = NADIE;
+    else if(bola_jugador == tenista2) tenista1 = NADIE;
 
     pintar_inciales(nombre1, pos_t1);
     pintar_fila_fondo(ANCHO_PISTA);
@@ -219,7 +219,7 @@ void pintar_campo(int ancho_pista, int largo_pista, int pos_bola, t_tenista teni
         case tenista2:
             extremo_pista = largo_pista;
             break;
-        case nadie:
+        case NADIE:
             extremo_pista = 0;
             break;
     }
