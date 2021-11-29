@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <ctime>
+#include <iomanip> 
 
 using namespace std;
 
@@ -23,6 +24,7 @@ string puntos_a_string(t_puntos_juego puntuacion);
 void pintar_marcador(string nombre1, string nombre2, t_puntos_juego &puntos1, t_puntos_juego &puntos2, int juegos1, int juegos2, t_tenista serivico_para);
 void sumar_punto(t_puntos_juego &puntos);
 void actualizar_marcador(t_tenista ganador_punto, t_puntos_juego &puntos1, t_puntos_juego &puntos2, int &juegos1, int &juegos2, t_tenista &ganador_juego);
+void mostrar_estadistica(t_tenista tenista, t_conteo_golpes &golpes1, t_conteo_golpes &golpes2, int golpes_ganadores);
 
 void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_golpes golpes, int &golpes_ganados, int velocidad, int &pos_recibe, int &pos_bola, t_tenista &ganador_lance);
 void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, t_conteo_golpes golpes2, int &golopes_ganados2, t_tenista &ganador_punto);
@@ -75,7 +77,7 @@ int main(){
     ganador = false;
 
     while(!ganador){
-        pintar_marcador(nombre1, nombre2, puntos1, puntos2, juegos1, juegos2, saqueInicial());
+        //pintar_marcador(nombre1, nombre2, puntos1, puntos2, juegos1, juegos2, saqueInicial());
         if(puntos1 > 3 && puntos2 < 3){
             cout << "El ganador del juego es " << nombre1 << "!!" << endl;
             ganador = true;
@@ -103,6 +105,27 @@ int main(){
     return 0;
 }
 
+void mostrar_estadistica(t_tenista tenista, string nombre_tenista, t_conteo_golpes &golpes_tenista, t_conteo_golpes &golpes_rival, int golpes_ganadores){
+    string space = "       ";
+    int golpes_totales;
+    for(int i = 0; i <= sizeof(golpes_tenista) ; i++){
+      golpes_totales += golpes_tenista[i];
+    }
+    cout << "Estadisticas de " << nombre_tenista << ":" << endl;
+    cout << setw(10) << "Golpes totales: "<< golpes_tenista << endl;
+    cout << setw(10) << "Golpes ganadores: " << golpes_ganadores << endl;
+    cout << setw(10) << "Errores no forzados: " << golpes_tenista[0] + golpes_tenista[8] << endl;
+    cout << setw(10) << "Distribucion de los golpes en la pista: " << endl;
+    cout << setw(15) << " Calle";
+    for(int i = 0; i <= ANCHO_PISTA; i++){
+        cout << i << space;
+    }
+    cout << endl << setw(15) << "   %";
+    for(int i = 0; i <= ANCHO_PISTA; i++){
+        cout << space << golpes_tenista[i]/golpes_totales;
+    }
+}
+
 int introducir_dato(string dato, int min, int max){
     int dato_i;
     cout << "> Introduzca su " << dato << " (valor entre " << min << " y " << max << "): ";
@@ -126,9 +149,9 @@ t_tenista saqueInicial(){
     int random = rand()%2;
     t_tenista saque;
     if(random == 0)
-        saque = tenista1;
+        saque = TENISTA1;
     else
-        saque = tenista2;
+        saque = TENISTA2;
 
     return saque;
 }
@@ -177,6 +200,19 @@ void actualizar_marcador(t_tenista ganador_punto, t_puntos_juego &puntos1, t_pun
     else
         sumar_punto(puntos2);
 
+    if(puntos1 == VENTAJA && int(puntos2) < int(cuarenta)){
+        ganador_juego = TENISTA1;
+    } else if(puntos2 == VENTAJA && int(puntos1) < int(cuarenta)){
+        ganador_juego = TENISTA2;
+    } else
+        ganador_juego = NADIE;
+
+
+    if(puntos1 == VENTAJA && puntos2 == VENTAJA){
+        puntos1 = cuarenta;
+        puntos2 = cuarenta;
+    }
+
     //hazte porfas esta parte tu que yo no tengo ni idea
     //osea, lo que tienes que hacer es comprobar si ha ganado, y si iban "40 - 40" o "40 - Ad" manejar el tema de las ventajas
 }
@@ -201,7 +237,7 @@ void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocid
     int habilidad_ataca, velocidad_defiende, golpes_ganados_ataca, pos1 = ANCHO_PISTA / 2 + 1, pos2 = ANCHO_PISTA / 2 + 1, pos_bola = ANCHO_PISTA / 2 + 1;
     int pos_ataca, pos_defiende;
     t_tenista tenista_defiende;
-    t_conteo_golpes golpes_ataca; 
+    t_conteo_golpes golpes_ataca;
     while(ganador_punto == NADIE){
         if(servicio == TENISTA1){
             habilidad_ataca = habilidad1;
@@ -244,10 +280,10 @@ void pintar_campo(int ancho_pista, int largo_pista, int pos_bola, t_tenista teni
     int extremo_pista;
 
     switch(tenista){
-        case tenista1:
+        case TENISTA1:
             extremo_pista = 1;
             break;
-        case tenista2:
+        case TENISTA2:
             extremo_pista = largo_pista;
             break;
         case NADIE:
