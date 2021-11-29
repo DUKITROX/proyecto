@@ -107,7 +107,7 @@ int main(){
 
 void mostrar_estadistica(t_tenista tenista, string nombre_tenista, t_conteo_golpes &golpes_tenista, t_conteo_golpes &golpes_rival, int golpes_ganadores){
     string space = "       ";
-    int golpes_totales;
+    int golpes_totales = 0;
     for(int i = 0; i <= sizeof(golpes_tenista) ; i++){
       golpes_totales += golpes_tenista[i];
     }
