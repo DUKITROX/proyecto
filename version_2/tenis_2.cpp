@@ -4,31 +4,51 @@
 
 using namespace std;
 
-const bool DEBUG_MODE = true, JUEGO_ALEATORIO = true;
-const int ANCHO_PISTA = 7, MIN_HABILIDAD = 1, MAX_HABILIDAD = 3, MIN_VELOCIDAD = 1, MAX_VELOCIDAD = 5;
-const int LARGO_PISTA = 3, JUEGOS_SET = 3;
-;
+const bool MODO_DEBUG = true, JUEGO_ALEATORIO = true;
+
+const int MIN_HABILIDAD = 1, MAX_HABILIDAD = 3;
+const int MIN_VELOCIDAD = 1, MAX_VELOCIDAD = 5;
+const int ANCHO_PISTA = 7, LARGO_PISTA = 3, JUEGOS_SET = 3;
+const int DIM_ARRAY_GOLPES = ANCHO_PISTA + 2;
 
 typedef enum {nadie, tenista1, tenista2} t_tenista;
 typedef enum {nada , quince, treinta, cuarenta, ventaja} t_puntos_juego;
+typedef int t_conteo_golpes[ANCHO_PISTA + 2];
 
-string marcador(int puntuacion);
+void introducir_tenista(string &iniciales, int &habilidad, int &velocidad);
+int introducirDato(string dato, int min_dato, int max_dato);
+t_tenista saqueInicial();
+
+string puntos_a_string(t_puntos_juego puntuacion);
 void pintar_marcador(string nombre1, string nombre2, t_puntos_juego &puntos1, t_puntos_juego &puntos2, int juegos1, int juegos2, t_tenista serivico_para);
+void actualizar_marcador(t_tenista ganador_punto, t_puntos_juego &puntos1, t_puntos_juego &puntos2, int &juegos1, int &juegos2, t_tenista &ganador_juego);
+string marcador(int puntuacion);
+
+//void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_golpes golpes, int &golpes_ganados, int velocidad, int &pos_recibe, int &pos_bola, t_tenista &ganador_lance);
+void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, t_conteo_golpes golpes2, int &golopes_ganados2, t_tenista &ganador_punto);
+void jugar_juego(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, int &juegos1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, int &juegos2, t_conteo_golpes golpes2, int &golpes_ganados2, t_tenista &ganador_punto);
 void pintar_peloteo(string nombre1, string nombre2, int pos_t1, int pos_t2, t_tenista bola_jugador, int pos_bola);
 void pintar_campo(int ancho_pista, int largo_pista, int pos_bola, t_tenista tenista);
+
 int correTenista(int posicion_tenista, int velocidad, int posicion_bola);
-int introducirDato(string dato, int min_dato, int max_dato);
 int golpeoBola(int posicion_tenista, int habilidad);
-t_tenista saqueInicial();
+
 void punto(t_puntos_juego &puntos);
 string juego(int habilidad1, int habilidad2, int velocidad1, int velocidad2, string nombre1, string nombre2);
 
 int main(){
-<<<<<<< HEAD
-    int n = 1;
-    int c = 2;
-    pintar_peloteo("ASD", "FNG", 1, 7, tenista1, 3);
-=======
+    srand(time(NULL));
+    string ini1, ini2;
+    int habilidad1, habilidad2;
+    int velocidad1, velocidad2;
+    t_puntos_juego puntos1, puntos2;
+    int juegos1, juegos2;
+
+    t_conteo_golpes golpes1, golpes2;
+    int golpes_ganadores1, golpes_ganadores2;
+}
+
+int main(){
 
     srand(time(NULL));
     string nombre1, nombre2, ganador_punto;
@@ -36,22 +56,16 @@ int main(){
     int habilidad1, habilidad2, velocidad1, velocidad2, juegos1 = 0, juegos2 = 0;;
     bool ganador;
 
-    cout << "BIENVENIDO/S AL MEJOR TENIS JAMAS PROGRAMADO" << endl;
+    cout << "Bienvenidos al simulador de partidos de tenis" << endl;
     cout << endl;
 
     //Datos tenista 1
     cout << endl << "Datos del tenista 1" << endl;
-    cout << "- Iniciales del tenista1: ";
-    cin >> nombre1;
-    habilidad1 = introducirDato("habilidad", MIN_HABILIDAD, MAX_HABILIDAD);
-    velocidad1 = introducirDato("velocidad", MIN_VELOCIDAD, MAX_VELOCIDAD);
+    introducir_tenista(nombre1, habilidad1, velocidad1);
 
     //Datos tenista 2
     cout << endl << "Datos del tenista 2" << endl;
-    cout << "- Iniciales del tenista2: ";
-    cin >> nombre2;
-    habilidad2 = introducirDato("habilidad", MIN_HABILIDAD, MAX_HABILIDAD);
-    velocidad2 = introducirDato("velocidad", MIN_VELOCIDAD, MAX_VELOCIDAD);
+    introducir_tenista(nombre2, habilidad2, velocidad2);
 
     //Juego
     ganador = false;
@@ -82,8 +96,249 @@ int main(){
                 puntos2 = t_puntos_juego(3);
         }
     }
->>>>>>> c4ce2294740e89490324adf7fc51ca7d153d85b2
     return 0;
+}
+
+int introducir_dato(string dato, int min, int max){
+    int dato_i;
+    cout << "> Introduzca su " << dato << " (valor entre " << min << " y " << max << "): ";
+    cin >> dato_i;
+
+    while(dato_i < min || dato_i > max || cin.fail()){
+        cin.clear();
+        cin.ignore();
+        cout << "Dato incorrecto o fuera de rango, vuelva a introducirlo (" << min << " y " << max << "): ";
+        cin >> dato_i;
+    }
+    return dato_i;
+}
+void introducir_tenista(string &iniciales, int &habilidad, int &velocidad){
+    cout << "   >Introduce sus iniciales (3 letras): ";
+    cin >> iniciales;
+    habilidad = introducir_dato("habilidad", MIN_HABILIDAD, MAX_HABILIDAD);
+    velocidad = introducir_dato("velocidad", MIN_VELOCIDAD, MAX_VELOCIDAD);
+}
+
+void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_golpes &golpes, int &golpes_ganados, int velocidad, int &pos_recibe, int &pos_bola, t_tenista &ganador_lance){
+    ganador_lance = nadie;
+    pos_bola = golpeo_bola(pos_bola, habilidad);
+    golpes[pos_bola]++;
+    if(pos_bola <= ANCHO_PISTA && pos_bola > 0){
+        golpes_ganados++;
+        pos_recibe = corre_tenista(pos_recibe, velocidad, pos_bola);
+        if(pos_recibe != pos_bola){
+            ganador_lance = tenista_que_golpea;
+        }
+    }else{
+        if(tenista_que_golpea == tenista1) ganador_lance = tenista2;
+        else ganador_lance = tenista1;
+    }
+}
+void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, t_conteo_golpes &golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, t_conteo_golpes &golpes2, int &golopes_ganados2, t_tenista &ganador_punto){
+    ganador_punto = nadie;
+    int habilidad_ataca, velocidad_defiende, golpes_ganados_ataca, pos1 = ANCHO_PISTA / 2 + 1, pos2 = ANCHO_PISTA / 2 + 1, pos_bola = ANCHO_PISTA / 2 + 1;
+    int pos_ataca, pos_defiende;
+    t_tenista tenista_defiende;
+    t_conteo_golpes golpes_ataca; //como incorporas el tema de "t_conteo_golpes" sin que sea por referencia
+    while(ganador_punto == nadie){
+        if(servicio == tenista1){
+            habilidad_ataca = habilidad1;
+            velocidad_defiende = velocidad2;
+            golpes_ganados_ataca = golpes_ganados1;
+            pos_ataca = pos1;
+            pos_defiende = pos2;
+            tenista_defiende = tenista2;
+        }else{
+            habilidad_ataca = habilidad2;
+            velocidad_defiende = velocidad1;
+            golpes_ganados_ataca = golopes_ganados2;
+            pos_ataca = pos2;
+            pos_defiende = pos1;
+            tenista_defiende = tenista1;
+        }
+        lance(servicio, nombre1, habilidad_ataca, golpes_ataca, golpes_ganados_ataca, velocidad_defiende, pos_defiende, pos_bola, ganador_punto);
+        pintar_peloteo(nombre1, nombre2, pos1, pos2, tenista_defiende, pos_bola);
+        if(servicio == tenista2) servicio = tenista1;
+        else servicio = tenista2;
+    }
+}
+void punto(t_puntos_juego &puntos){
+    int i = int(puntos);
+    i++;
+    puntos = t_puntos_juego(i);
+}
+
+t_tenista saqueInicial(){
+    int i = rand()%2;
+    t_tenista saque;
+    if(i == 0)
+        saque = tenista1;
+    else
+        saque = tenista2;
+    return saque;
+}
+string puntos_a_string(t_puntos_juego puntuacion){
+    string puntuacion_s;
+    switch(t_puntos_juego){
+        case nada:
+            puntuacion_s = "00";
+            break;
+        case quince:
+            puntuacion_s = "15";
+            break;
+        case treinta:
+            puntuacion_s = "30";
+            break;
+        case cuarenta:
+            puntuacion_s = "40";
+            break;
+        case ventaja:
+            puntuacion_s = "Ad";
+            break;
+    }
+    return puntuacion_s;
+}
+
+void pintar_marcador(string nombre1, string nombre2, t_puntos_juego &puntos1, t_puntos_juego &puntos2, int juegos1, int juegos2, t_tenista serivico_para){
+
+    string marcador1 = marcador(puntos1);
+    string marcador2 = marcador(puntos2);
+
+    cout << endl << "   " << nombre1 << "  " << juegos1 << " : " << marcador1 << " ";
+    if(serivico_para == tenista1) cout << '*';
+
+    cout << endl << "   " << nombre2 << "  " << juegos2 << " : " << marcador2 << " ";
+    if(serivico_para == tenista2) cout << '*';
+    cout << endl << endl;
+}
+void pintar_fila_fondo(int ancho_pista){
+    cout << " ";
+    for(int i = 0; i < ANCHO_PISTA; i++){
+        cout << " -";
+    }
+    cout << endl;
+}
+void pintar_campo(int ancho_pista, int largo_pista, int pos_bola, t_tenista tenista){
+    char bola;
+    int extremo_pista;
+
+    switch(tenista){
+        case tenista1:
+            extremo_pista = 1;
+            break;
+        case tenista2:
+            extremo_pista = largo_pista;
+            break;
+        case nadie:
+            extremo_pista = 0;
+            break;
+    }
+
+    for(int i = 1; i <= largo_pista; i++){
+        bola = 0 < pos_bola < ancho_pista+1 && i == extremo_pista ? bola = 'o' : bola = ' ';
+        cout << " ";
+        for(int j = 1; j <= ancho_pista; j++){
+            cout << "| ";
+            if(pos_bola == j) cout << "\b" << bola;
+        }
+        cout << "|" << endl;
+    }
+}
+void pintar_fila_medio(int ancho_pista){
+    cout << "-";
+    for(int i = 1; i <= ancho_pista; i++) {
+        cout << "-" << i;
+        }
+    cout << "--" << endl;
+}
+void pintar_inciales(string iniciales, int pos_tenista){
+    cout << " ";
+    for(int i = 1; i < pos_tenista; i++) {
+        cout << "  ";
+        }
+    cout << iniciales << endl;
+}
+void pintar_peloteo(string nombre1, string nombre2, int pos_t1, int pos_t2, t_tenista bola_jugador, int pos_bola){
+    t_tenista tenista1 = tenista1, tenista2 = tenista2;
+    if(bola_jugador == tenista1) tenista2 = nadie;
+    else if(bola_jugador == tenista2) tenista1 = nadie;
+
+    pintar_inciales(nombre1, pos_t1);
+    pintar_fila_fondo(ANCHO_PISTA);
+    pintar_campo(ANCHO_PISTA, LARGO_PISTA, pos_bola, tenista1);
+    pintar_fila_medio(ANCHO_PISTA);
+    pintar_campo(ANCHO_PISTA, LARGO_PISTA, pos_bola, tenista2);
+    pintar_fila_fondo(ANCHO_PISTA);
+    pintar_inciales(nombre2, pos_t2);
+}
+
+int corre_tenista(int posicion_tenista, int velocidad, int pos_bola){
+    int distancia = abs(posicion_tenista - pos_bola);
+    int posicion_final;
+
+    if(distancia <= velocidad){
+        if(MODO_DEBUG)
+            cout << "El tenista llega a la bola" << endl << endl;
+        posicion_final = pos_bola;
+
+    }else{
+        if(MODO_DEBUG)
+            cout << "El tenista no ha llegado a la bola" << endl << endl;
+
+        if(posicion_tenista < pos_bola){
+            posicion_final = posicion_tenista + velocidad;
+        }else{
+            posicion_final = posicion_tenista - velocidad;
+        }
+    }
+    return posicion_final;
+}
+
+int golpeo_bola(int posicion_tenista, int habilidad){
+    int destino_bola, distancia;
+
+    if(JUEGO_ALEATORIO){
+        destino_bola = rand()%ANCHO_PISTA + 1;
+        cout << endl;
+        if(MODO_DEBUG)
+            cout << endl << "El jugador dispara hacia la calle" << destino_bola << endl;
+    }else{
+        cin >> destino_bola;
+        while(destino_bola < 1 || destino_bola > ANCHO_PISTA || cin.fail()){
+            cin.clear();
+            cin.ignore();
+            cout << "Calle fuera de rango (1 - " << ANCHO_PISTA << "), vuelva introducir calle: ";
+            cin >> destino_bola;
+        }
+    }
+
+    distancia = abs(posicion_tenista - destino_bola);
+
+    if(distancia <= habilidad){
+        if(MODO_DEBUG)cout << "Ese ha sido un tiro sencillo" << endl;
+    }else{
+        int probabilidad_extito = 100 - ((distancia-habilidad)*100 / ((ANCHO_PISTA-1)-MIN_HABILIDAD));
+        int random = rand()%100;
+
+        if(random < probabilidad_extito){
+            if(MODO_DEBUG){
+                cout << "Tiro complicado que... (propab_exito = "<<probabilidad_extito<<" y resultado = "<<random<<") Llega a su destino!"<<endl;
+                cout << "La bola llega a la calle " << destino_bola << endl;}
+        }else{
+            int random2 = rand()%2;
+            if(random2 == 0) destino_bola++; 
+            else destino_bola--;
+
+            if(MODO_DEBUG){
+                cout << "Tiro complicado que... (propab_exito = "<<probabilidad_extito<<" y resultado = "<<random<<") No ha sido preciso!"<<endl;
+                if(destino_bola < 1 || destino_bola > ANCHO_PISTA){
+                    cout << "La bola se sale fuera" << endl << endl;}
+                else{
+                    cout << "La bola llega a la calle " << destino_bola << endl;}
+            }
+        }
+    }
+    return destino_bola;
 }
 
 string juego(int habilidad1, int habilidad2, int velocidad1, int velocidad2, string nombre1, string nombre2, t_tenista tenista1, t_tenista tenista2){
@@ -134,117 +389,4 @@ string juego(int habilidad1, int habilidad2, int velocidad1, int velocidad2, str
 
     }
     return ganador_punto;
-}
-
-void punto(t_puntos_juego &puntos){
-    int i = int(puntos);
-    i++;
-    puntos = t_puntos_juego(i);
-}
-
-t_tenista saqueInicial(){
-    int i = rand()%2;
-    t_tenista saque;
-    if(i == 0)
-        saque = tenista1;
-    else
-        saque = tenista2;
-    return saque;
-}
-
-string marcador(int puntuacion){
-    string puntuacion_s;
-    switch(puntuacion){
-        case 0:
-            puntuacion_s = "00";
-            break;
-        case 1:
-            puntuacion_s = "15";
-            break;
-        case 2:
-            puntuacion_s = "30";
-            break;
-        case 3:
-            puntuacion_s = "40";
-            break;
-        default:
-            puntuacion_s = "Ad";
-            break;
-    }
-    return puntuacion_s;
-}
-
-void pintar_marcador(string nombre1, string nombre2, t_puntos_juego &puntos1, t_puntos_juego &puntos2, int juegos1, int juegos2, t_tenista serivico_para){
-
-    string marcador1 = marcador(puntos1);
-    string marcador2 = marcador(puntos2);
-
-    cout << endl << "   " << nombre1 << "  " << juegos1 << " : " << marcador1 << " ";
-    if(serivico_para == tenista1) cout << '*';
-
-    cout << endl << "   " << nombre2 << "  " << juegos2 << " : " << marcador2 << " ";
-    if(serivico_para == tenista2) cout << '*';
-    cout << endl << endl;
-}
-
-void pintar_fila_fondo(int ancho_pista){
-    cout << " ";
-    for(int i = 0; i < ANCHO_PISTA; i++){
-        cout << " -";
-    }
-    cout << endl;
-}
-void pintar_campo(int ancho_pista, int largo_pista, int pos_bola, t_tenista tenista){
-    char bola;
-    int extremo_pista;
-
-    switch(tenista){
-        case tenista1:
-            extremo_pista = 1;
-            break;
-        case tenista2:
-            extremo_pista = largo_pista;
-            break;
-        case nadie:
-            extremo_pista = 0;
-            break;
-    }
-
-    for(int i = 1; i <= largo_pista; i++){
-        bola = 0 < pos_bola < ancho_pista+1 && i == extremo_pista ? bola = 'o' : bola = ' ';
-        cout << " ";
-        for(int j = 1; j <= ancho_pista; j++){
-            cout << "| ";
-            if(pos_bola == j) cout << "\b" << bola;
-        }
-        cout << "|" << endl;
-    }
-}
-void pintar_fila_medio(int ancho_pista){
-    cout << "-";
-    for(int i = 1; i <= ancho_pista; i++) {
-        cout << "-" << i;
-        }
-    cout << "--" << endl;
-}
-void pintar_inciales(string iniciales, int pos_tenista){
-    cout << " ";
-    for(int i = 1; i < pos_tenista; i++) {
-        cout << "  ";
-        }
-    cout << iniciales << endl;
-}
-
-void pintar_peloteo(string nombre1, string nombre2, int pos_t1, int pos_t2, t_tenista bola_jugador, int pos_bola){
-    t_tenista tenista1 = tenista1, tenista2 = tenista2;
-    if(bola_jugador == tenista1) tenista2 = nadie;
-    else if(bola_jugador == tenista2) tenista1 = nadie;
-
-    pintar_inciales(nombre1, pos_t1);
-    pintar_fila_fondo(ANCHO_PISTA);
-    pintar_campo(ANCHO_PISTA, LARGO_PISTA, pos_bola, tenista1);
-    pintar_fila_medio(ANCHO_PISTA);
-    pintar_campo(ANCHO_PISTA, LARGO_PISTA, pos_bola, tenista2);
-    pintar_fila_fondo(ANCHO_PISTA);
-    pintar_inciales(nombre2, pos_t2);
 }
