@@ -19,17 +19,20 @@ int introducirDato(string dato, int min_dato, int max_dato);
 void introducir_tenista(string &iniciales, int &habilidad, int &velocidad);
 t_tenista saqueInicial();
 
-string marcador(t_puntos_juego puntuacion);
+string puntos_a_string(t_puntos_juego puntuacion);
 void pintar_marcador(string nombre1, string nombre2, t_puntos_juego &puntos1, t_puntos_juego &puntos2, int juegos1, int juegos2, t_tenista serivico_para);
 void sumar_punto(t_puntos_juego &puntos);
 void actualizar_marcador(t_tenista ganador_punto, t_puntos_juego &puntos1, t_puntos_juego &puntos2, int &juegos1, int &juegos2, t_tenista &ganador_juego);
-string marcador(int puntuacion);
 
-//void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_golpes golpes, int &golpes_ganados, int velocidad, int &pos_recibe, int &pos_bola, t_tenista &ganador_lance);
+void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_golpes golpes, int &golpes_ganados, int velocidad, int &pos_recibe, int &pos_bola, t_tenista &ganador_lance);
 void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, t_conteo_golpes golpes2, int &golopes_ganados2, t_tenista &ganador_punto);
 void jugar_juego(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, int &juegos1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, int &juegos2, t_conteo_golpes golpes2, int &golpes_ganados2, t_tenista &ganador_punto);
-void pintar_peloteo(string nombre1, string nombre2, int pos_t1, int pos_t2, t_tenista bola_jugador, int pos_bola);
+
+void pintar_iniciales(string iniciales, int pos_tenista);
+void pintar_fila_fondo(int ancho_pista);
 void pintar_campo(int ancho_pista, int largo_pista, int pos_bola, t_tenista tenista);
+void pintar_fila_medio(int ancho_pista);
+void pintar_peloteo(string nombre1, string nombre2, int pos_t1, int pos_t2, t_tenista bola_jugador, int pos_bola);
 
 int correTenista(int posicion_tenista, int velocidad, int posicion_bola);
 int golpeoBola(int posicion_tenista, int habilidad);
@@ -53,7 +56,7 @@ int main(){
 
     srand(time(NULL));
     string nombre1, nombre2, ganador_punto;
-    t_puntos_juego puntos1 = nada, puntos2 = nada;
+    t_puntos_juego puntos1 = NADA, puntos2 = NADA;
     int habilidad1, habilidad2, velocidad1, velocidad2, juegos1 = 0, juegos2 = 0;;
     bool ganador;
 
@@ -130,7 +133,7 @@ t_tenista saqueInicial(){
     return saque;
 }
 
-string marcador(t_puntos_juego puntuacion){
+string puntos_a_string(t_puntos_juego puntuacion){
     string puntuacion_s;
     switch(puntuacion){
         case NADA:
@@ -153,8 +156,8 @@ string marcador(t_puntos_juego puntuacion){
 }
 void pintar_marcador(string nombre1, string nombre2, t_puntos_juego puntos1, t_puntos_juego puntos2, int juegos1, int juegos2, t_tenista serivico_para){
 
-    string marcador1 = marcador(puntos1);
-    string marcador2 = marcador(puntos2);
+    string marcador1 = puntos_a_string(puntos1);
+    string marcador2 = puntos_a_string(puntos2);
 
     cout << endl << "   " << nombre1 << "  " << juegos1 << " : " << marcador1 << " ";
     if(serivico_para == TENISTA1) cout << '*';
@@ -178,7 +181,7 @@ void actualizar_marcador(t_tenista ganador_punto, t_puntos_juego &puntos1, t_pun
     //osea, lo que tienes que hacer es comprobar si ha ganado, y si iban "40 - 40" o "40 - Ad" manejar el tema de las ventajas
 }
 
-void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_golpes &golpes, int &golpes_ganados, int velocidad, int &pos_recibe, int &pos_bola, t_tenista &ganador_lance){
+void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_golpes golpes, int &golpes_ganados, int velocidad, int &pos_recibe, int &pos_bola, t_tenista &ganador_lance){
     ganador_lance = NADIE;
     pos_bola = golpeo_bola(pos_bola, habilidad);
     golpes[pos_bola]++;
@@ -189,8 +192,8 @@ void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_
             ganador_lance = tenista_que_golpea;
         }
     }else{
-        if(tenista_que_golpea == tenista1) ganador_lance = tenista2;
-        else ganador_lance = tenista1;
+        if(tenista_que_golpea == TENISTA1) ganador_lance = TENISTA2;
+        else ganador_lance = TENISTA1;
     }
 }
 void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, t_conteo_golpes &golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, t_conteo_golpes &golpes2, int &golopes_ganados2, t_tenista &ganador_punto){
@@ -198,7 +201,7 @@ void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocid
     int habilidad_ataca, velocidad_defiende, golpes_ganados_ataca, pos1 = ANCHO_PISTA / 2 + 1, pos2 = ANCHO_PISTA / 2 + 1, pos_bola = ANCHO_PISTA / 2 + 1;
     int pos_ataca, pos_defiende;
     t_tenista tenista_defiende;
-    t_conteo_golpes golpes_ataca; //como incorporas el tema de "t_conteo_golpes" sin que sea por referencia
+    t_conteo_golpes golpes_ataca; 
     while(ganador_punto == NADIE){
         if(servicio == TENISTA1){
             habilidad_ataca = habilidad1;
@@ -222,6 +225,13 @@ void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocid
     }
 }
 
+void pintar_inciales(string iniciales, int pos_tenista){
+    cout << " ";
+    for(int i = 1; i < pos_tenista; i++) {
+        cout << "  ";
+        }
+    cout << iniciales << endl;
+}
 void pintar_fila_fondo(int ancho_pista){
     cout << " ";
     for(int i = 0; i < ANCHO_PISTA; i++){
@@ -261,13 +271,6 @@ void pintar_fila_medio(int ancho_pista){
         cout << "-" << i;
         }
     cout << "--" << endl;
-}
-void pintar_inciales(string iniciales, int pos_tenista){
-    cout << " ";
-    for(int i = 1; i < pos_tenista; i++) {
-        cout << "  ";
-        }
-    cout << iniciales << endl;
 }
 void pintar_peloteo(string nombre1, string nombre2, int pos_t1, int pos_t2, t_tenista bola_jugador, int pos_bola){
     t_tenista tenista1 = tenista1, tenista2 = tenista2;
