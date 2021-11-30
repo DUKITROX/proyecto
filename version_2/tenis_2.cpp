@@ -12,7 +12,7 @@ const int ANCHO_PISTA = 7, LARGO_PISTA = 3, JUEGOS_SET = 3;
 const int DIM_ARRAY_GOLPES = ANCHO_PISTA + 2;
 
 typedef enum {NADIE, TENISTA1, TENISTA2} t_tenista;
-typedef enum {NADA , QUINCE, TREINTA, cuarenta, VENTAJA} t_puntos_juego;
+typedef enum {NADA , QUINCE, TREINTA, CUARENTA, VENTAJA} t_puntos_juego;
 typedef int t_conteo_golpes[ANCHO_PISTA + 2];
 
 int introducirDato(string dato, int min_dato, int max_dato);
@@ -145,7 +145,7 @@ string puntos_a_string(t_puntos_juego puntuacion){
         case TREINTA:
             puntuacion_s = "30";
             break;
-        case cuarenta:
+        case CUARENTA:
             puntuacion_s = "40";
             break;
         case VENTAJA:
@@ -196,33 +196,49 @@ void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_
         else ganador_lance = TENISTA1;
     }
 }
-void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, t_conteo_golpes &golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, t_conteo_golpes &golpes2, int &golopes_ganados2, t_tenista &ganador_punto){
+void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, t_conteo_golpes golpes2, int &golopes_ganados2, t_tenista &ganador_punto){
     ganador_punto = NADIE;
-    int habilidad_ataca, velocidad_defiende, golpes_ganados_ataca, pos1 = ANCHO_PISTA / 2 + 1, pos2 = ANCHO_PISTA / 2 + 1, pos_bola = ANCHO_PISTA / 2 + 1;
+    int habilidad_ataca, velocidad_defiende, golpes_ganados_ataca;
+    t_conteo_golpes golpes_ataca;
+    t_tenista tenista_ataca = servicio, tenista_defiende;
+
+    int medio_campo = ANCHO_PISTA / 2 + 1;
+    int pos1 = medio_campo, pos2 = medio_campo, pos_bola = medio_campo;
     int pos_ataca, pos_defiende;
-    t_tenista tenista_defiende;
-    t_conteo_golpes golpes_ataca; 
+
     while(ganador_punto == NADIE){
-        if(servicio == TENISTA1){
+        if(tenista_ataca == TENISTA1){
             habilidad_ataca = habilidad1;
             velocidad_defiende = velocidad2;
-            golpes_ganados_ataca = golpes_ganados1;
+
             pos_ataca = pos1;
             pos_defiende = pos2;
+
+            for(int i = 0; i < ANCHO_PISTA + 2; i++){
+                golpes_ataca[i] = golpes1[i];
+            }
+            golpes_ganados_ataca = golpes_ganados1;
+
             tenista_defiende = TENISTA2;
         }else{
             habilidad_ataca = habilidad2;
             velocidad_defiende = velocidad1;
-            golpes_ganados_ataca = golopes_ganados2;
+
             pos_ataca = pos2;
             pos_defiende = pos1;
+
             tenista_defiende = TENISTA1;
         }
-        lance(servicio, nombre1, habilidad_ataca, golpes_ataca, golpes_ganados_ataca, velocidad_defiende, pos_defiende, pos_bola, ganador_punto);
+        lance(tenista_ataca, nombre1, habilidad_ataca, golpes_ataca, golpes_ganados_ataca, velocidad_defiende, pos_defiende, pos_bola, ganador_punto);
         pintar_peloteo(nombre1, nombre2, pos1, pos2, tenista_defiende, pos_bola);
-        if(servicio == TENISTA2) servicio = TENISTA1;
-        else servicio = TENISTA2;
+
+        if(tenista_ataca == TENISTA1){
+
+        }else{
+
+        }
     }
+    //actualizar_marcador();
 }
 
 void pintar_inciales(string iniciales, int pos_tenista){
@@ -244,10 +260,10 @@ void pintar_campo(int ancho_pista, int largo_pista, int pos_bola, t_tenista teni
     int extremo_pista;
 
     switch(tenista){
-        case tenista1:
+        case TENISTA1:
             extremo_pista = 1;
             break;
-        case tenista2:
+        case TENISTA2:
             extremo_pista = largo_pista;
             break;
         case NADIE:
@@ -266,6 +282,7 @@ void pintar_campo(int ancho_pista, int largo_pista, int pos_bola, t_tenista teni
     }
 }
 void pintar_fila_medio(int ancho_pista){
+    //TODO: el "ancho pista" la pides por parametros o la uedes usar por const. globasl?
     cout << "-";
     for(int i = 1; i <= ancho_pista; i++) {
         cout << "-" << i;
