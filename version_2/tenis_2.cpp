@@ -175,8 +175,14 @@ void actualizar_marcador(t_tenista ganador_punto, t_puntos_juego &puntos1, t_pun
 
     if(puntos1 == VENTAJA && int(puntos2) < int(cuarenta)){
         ganador_juego = TENISTA1;
+        juegos1++;
+        puntos1 = NADA;
+        puntos2 = NADA;
     } else if(puntos2 == VENTAJA && int(puntos1) < int(cuarenta)){
         ganador_juego = TENISTA2;
+        juegos2++;
+        puntos1 = NADA;
+        puntos2 = NADA;
     } else
         ganador_juego = NADIE;
 
@@ -185,40 +191,6 @@ void actualizar_marcador(t_tenista ganador_punto, t_puntos_juego &puntos1, t_pun
         puntos1 = cuarenta;
         puntos2 = cuarenta;
     }
-
-    /*
-
-    ganador = false;
-
-    while(!ganador){
-        //pintar_marcador(nombre1, nombre2, puntos1, puntos2, juegos1, juegos2, saqueInicial());
-        if(puntos1 > 3 && puntos2 < 3){
-            cout << "El ganador del juego es " << nombre1 << "!!" << endl;
-            ganador = true;
-        }else if(puntos2 > 3 && puntos1 < 3){
-            cout << "El ganador del juego es " << nombre2 << "!!" << endl;
-            ganador = true;
-        }else if(puntos1 == 3 && puntos2 == 5 ){
-            cout << "El ganador del juego es " << nombre2 << "!!" << endl;
-            ganador = true;
-        } else if ( puntos2 == 3 && puntos1 == 5 ){
-            cout << "El ganador del juego es " << nombre1 << "!!" << endl;
-            ganador = true;
-        } else {
-            if(juego(habilidad1, habilidad2, velocidad1, velocidad2, nombre1, nombre2) == nombre1){
-                punto(puntos1);
-            }else{
-                punto(puntos2);
-            }
-        }
-        if(puntos1 == puntos2 && int(puntos1) == 4){
-                puntos1 = t_puntos_juego(3);
-                puntos2 = t_puntos_juego(3);
-        }
-    }
-*/
-    //hazte porfas esta parte tu que yo no tengo ni idea
-    //osea, lo que tienes que hacer es comprobar si ha ganado, y si iban "40 - 40" o "40 - Ad" manejar el tema de las ventajas
 }
 
 void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_golpes golpes, int &golpes_ganados, int velocidad, int &pos_recibe, int &pos_bola, t_tenista &ganador_lance){
