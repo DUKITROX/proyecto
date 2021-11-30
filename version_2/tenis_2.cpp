@@ -74,34 +74,7 @@ int main(){
     introducir_tenista(nombre2, habilidad2, velocidad2);
 
     //Juego
-    ganador = false;
-
-    while(!ganador){
-        //pintar_marcador(nombre1, nombre2, puntos1, puntos2, juegos1, juegos2, saqueInicial());
-        if(puntos1 > 3 && puntos2 < 3){
-            cout << "El ganador del juego es " << nombre1 << "!!" << endl;
-            ganador = true;
-        }else if(puntos2 > 3 && puntos1 < 3){
-            cout << "El ganador del juego es " << nombre2 << "!!" << endl;
-            ganador = true;
-        }else if(puntos1 == 3 && puntos2 == 5 ){
-            cout << "El ganador del juego es " << nombre2 << "!!" << endl;
-            ganador = true;
-        } else if ( puntos2 == 3 && puntos1 == 5 ){
-            cout << "El ganador del juego es " << nombre1 << "!!" << endl;
-            ganador = true;
-        } else {
-            if(juego(habilidad1, habilidad2, velocidad1, velocidad2, nombre1, nombre2) == nombre1){
-                punto(puntos1);
-            }else{
-                punto(puntos2);
-            }
-        }
-        if(puntos1 == puntos2 && int(puntos1) == 4){
-                puntos1 = t_puntos_juego(3);
-                puntos2 = t_puntos_juego(3);
-        }
-    }
+    
     return 0;
 }
 
@@ -213,6 +186,37 @@ void actualizar_marcador(t_tenista ganador_punto, t_puntos_juego &puntos1, t_pun
         puntos2 = cuarenta;
     }
 
+    /*
+
+    ganador = false;
+
+    while(!ganador){
+        //pintar_marcador(nombre1, nombre2, puntos1, puntos2, juegos1, juegos2, saqueInicial());
+        if(puntos1 > 3 && puntos2 < 3){
+            cout << "El ganador del juego es " << nombre1 << "!!" << endl;
+            ganador = true;
+        }else if(puntos2 > 3 && puntos1 < 3){
+            cout << "El ganador del juego es " << nombre2 << "!!" << endl;
+            ganador = true;
+        }else if(puntos1 == 3 && puntos2 == 5 ){
+            cout << "El ganador del juego es " << nombre2 << "!!" << endl;
+            ganador = true;
+        } else if ( puntos2 == 3 && puntos1 == 5 ){
+            cout << "El ganador del juego es " << nombre1 << "!!" << endl;
+            ganador = true;
+        } else {
+            if(juego(habilidad1, habilidad2, velocidad1, velocidad2, nombre1, nombre2) == nombre1){
+                punto(puntos1);
+            }else{
+                punto(puntos2);
+            }
+        }
+        if(puntos1 == puntos2 && int(puntos1) == 4){
+                puntos1 = t_puntos_juego(3);
+                puntos2 = t_puntos_juego(3);
+        }
+    }
+*/
     //hazte porfas esta parte tu que yo no tengo ni idea
     //osea, lo que tienes que hacer es comprobar si ha ganado, y si iban "40 - 40" o "40 - Ad" manejar el tema de las ventajas
 }
