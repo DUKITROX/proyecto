@@ -248,8 +248,8 @@ int golpeo_bola(int posicion_tenista, int habilidad){
                 cout << "La bola llega a la calle " << destino_bola << endl;
                 sleep_for(nanoseconds(TIEMPO_DELAY_CORTO));}
         }else{
-            int random2 = rand()%2;
-            if(random2) destino_bola++; 
+            int random_fuera = rand()%2;
+            if(random_fuera) destino_bola++; 
             else destino_bola--;
 
             if(MODO_DEBUG){

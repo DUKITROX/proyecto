@@ -3,8 +3,8 @@
 #include <ctime>
 #include <iomanip> 
 using namespace std;
-//TODO: en las stats, los golpes ganadores siempre son iguales a los totales, revisar que pasa alli
-const bool MODO_DEBUG = true, JUEGO_ALEATORIO = true;
+
+const bool MODO_DEBUG = false, JUEGO_ALEATORIO = true;
 
 const int MIN_HABILIDAD = 1, MAX_HABILIDAD = 3;
 const int MIN_VELOCIDAD = 1, MAX_VELOCIDAD = 5;
@@ -167,8 +167,10 @@ void actualizar_marcador(t_tenista ganador_punto, t_puntos_juego &puntos1, t_pun
         puntos2 = CUARENTA;
     }else if(int(puntos1) == int(VENTAJA) + 1){ //Gana el tenista 1 tras estar en ventaja
         ganador_juego = TENISTA1;
+        juegos1++;
     }else if(int(puntos2) == int(VENTAJA) + 1){  //Gana el tenista 2 tras estar en ventaja
         ganador_juego = TENISTA2;
+        juegos2++;
     }
 }
 
@@ -181,15 +183,16 @@ void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_
 
         //system("pause");
         cin.get();
-    cout << "Golpea " << nombre << endl;
+    cout << "Golpea " << nombre << endl << endl;
     pos_bola = golpeo_bola(pos_bola, habilidad);
     golpes[pos_bola]++;
     if(0 < pos_bola && pos_bola <= ANCHO_PISTA){
         //la bola entra dentro
-        golpes_ganados++;
         pos_recibe = corre_tenista(pos_recibe, velocidad, pos_bola);
-        if(pos_recibe != pos_bola)
-            ganador_lance = tenista_que_golpea; //no llega a la bola
+        if(pos_recibe != pos_bola){
+            ganador_lance = tenista_que_golpea; // el tenista que defiende no llega a la bola
+            golpes_ganados++;
+        }
         
     }else{
         if(tenista_que_golpea == TENISTA1) ganador_lance = TENISTA2;
@@ -363,9 +366,10 @@ int golpeo_bola(int posicion_tenista, int habilidad){
     if(MODO_DEBUG)
         cout << endl << "El jugador dispara hacia la calle ";
 
-    if(JUEGO_ALEATORIO){
+    if(JUEGO_ALEATORIO){ //Elejie el propio programa a donde dispara la bola
         destino_bola = (rand()%ANCHO_PISTA) + 1;
-        cout << destino_bola << endl;
+        if(MODO_DEBUG)
+            cout << destino_bola << endl;
     }else{
         cin >> destino_bola;
         while(destino_bola < 1 || destino_bola > ANCHO_PISTA || cin.fail()){
@@ -389,9 +393,11 @@ int golpeo_bola(int posicion_tenista, int habilidad){
                 cout << "Tiro complicado que... (propab_exito = "<<probabilidad_extito<<" y resultado = "<<random<<") Llega a su destino!"<<endl;
                 cout << "La bola llega a la calle " << destino_bola << endl;}
         }else{
-            int random2 = rand()%2;
-            if(random2 == 0) destino_bola++;  //TODO: cambiar los nombres aqui
-            else destino_bola--;
+            int random_fuera = rand()%2;
+            if(random_fuera == 0) 
+                destino_bola--;
+            else 
+                destino_bola++;
 
             if(MODO_DEBUG){
                 cout << "Tiro complicado que... (propab_exito = "<<probabilidad_extito<<" y resultado = "<<random<<") No ha sido preciso!"<<endl;
