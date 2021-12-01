@@ -3,8 +3,8 @@
 #include <ctime>
 #include <iomanip> 
 using namespace std;
-
-const bool MODO_DEBUG = false, JUEGO_ALEATORIO = false;
+//TODO: en las stats, los golpes ganadores siempre son iguales a los totales, revisar que pasa alli
+const bool MODO_DEBUG = true, JUEGO_ALEATORIO = true;
 
 const int MIN_HABILIDAD = 1, MAX_HABILIDAD = 3;
 const int MIN_VELOCIDAD = 1, MAX_VELOCIDAD = 5;
@@ -75,7 +75,7 @@ int main(){
     cout << "   " << nombre2 << " " << juegos2 << endl << endl;
     string nombre_ganador;
     ganador_set == TENISTA1 ? nombre_ganador = nombre1 : nombre_ganador = nombre2;
-    cout << nombre_ganador << " se hizo con el partido" << endl << endl << "Gracias por jugar" << endl;
+    cout << nombre_ganador << " se hizo con el partido" << endl << endl << "Gracias por jugar" << endl << endl;
     
     return 0;
 }
@@ -156,21 +156,32 @@ void actualizar_marcador(t_tenista ganador_punto, t_puntos_juego &puntos1, t_pun
     else
         sumar_punto(puntos2);
 
-    if(puntos1 == VENTAJA && int(puntos2) < int(CUARENTA)){
+    if(puntos1 == VENTAJA && int(puntos2) < int(CUARENTA)){ //Gana el tenista 1 sin necesidad de ventaja
         ganador_juego = TENISTA1;
         juegos1++;
-    } else if(puntos2 == VENTAJA && int(puntos1) < int(CUARENTA)){
+    }else if(puntos2 == VENTAJA && int(puntos1) < int(CUARENTA)){ //Gana el tenista 2 sin necesidad de ventaja
         ganador_juego = TENISTA2;
         juegos2++;
-    }else if(puntos1 == VENTAJA && puntos2 == VENTAJA){
+    }else if(puntos1 == VENTAJA && puntos2 == VENTAJA){ //Se igualan a 40 los marcadores por estar en ventaja ambos
         puntos1 = CUARENTA;
         puntos2 = CUARENTA;
+    }else if(int(puntos1) == int(VENTAJA) + 1){ //Gana el tenista 1 tras estar en ventaja
+        ganador_juego = TENISTA1;
+    }else if(int(puntos2) == int(VENTAJA) + 1){  //Gana el tenista 2 tras estar en ventaja
+        ganador_juego = TENISTA2;
     }
 }
 
 void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_golpes golpes, int &golpes_ganados, int velocidad, int &pos_recibe, int &pos_bola, t_tenista &ganador_lance){
     ganador_lance = NADIE;
-    cout << "Golpea " << nombre << endl << endl;
+    if(JUEGO_ALEATORIO)
+        //Si estas en windows comentas {cin.get();} y descomentas {system("pause");}
+        //En caso de mac al reves, comentas {system("pause");}, y descomentas {cin.get();}
+        //Esto es para que todos los golpes del partido no te salgan de golpe, sino que salgan uno a uno
+
+        //system("pause");
+        cin.get();
+    cout << "Golpea " << nombre << endl;
     pos_bola = golpeo_bola(pos_bola, habilidad);
     golpes[pos_bola]++;
     if(0 < pos_bola && pos_bola <= ANCHO_PISTA){
@@ -221,7 +232,8 @@ void jugar_juego(t_tenista servicio, string nombre1, int habilidad1, int velocid
         cout << "El ganador del punto es " << ganador_punto_s << endl;
 
         actualizar_marcador(ganador_punto, puntos1, puntos2, juegos1, juegos2, ganador_juego);
-        pintar_marcador(nombre1, nombre2, puntos1, puntos2, juegos1, juegos2, servicio);
+        if(ganador_juego == NADIE)
+            pintar_marcador(nombre1, nombre2, puntos1, puntos2, juegos1, juegos2, servicio);
     }
     mostrar_estadistica(TENISTA1, nombre1, golpes1, golpes_ganados1);
     mostrar_estadistica(TENISTA2, nombre2, golpes2, golpes_ganados2);
@@ -257,6 +269,7 @@ void pintar_campo_con_bola(int pos_bola){
         else
             cout << " |";
     }
+    if(pos_bola == ANCHO_PISTA+1) cout << "o";
     cout << endl;
 }
 void pintar_fila_medio(){
@@ -298,6 +311,7 @@ void mostrar_estadistica(t_tenista tenista, string nombre, t_conteo_golpes golpe
     for(int i = 0; i < DIM_ARRAY_GOLPES ; i++) golpes_totales += golpes[i];
     errores_no_forzados = golpes[0] + golpes[DIM_ARRAY_GOLPES-1];
 
+    cout << endl;
     cout << "Estadisticas de " << nombre << endl;
     cout << "   " << "Golpes totales: "<< golpes_totales << endl;
     cout << "   " << "Golpes ganadores: " << golpes_ganadores << endl;
@@ -329,29 +343,29 @@ int corre_tenista(int posicion_tenista, int velocidad, int pos_bola){
 
     if(distancia <= velocidad){
         if(MODO_DEBUG)
-            cout << "El tenista llega a la bola" << endl << endl;
+            cout << "Su rival llega a la bola" << endl << endl;
         posicion_final = pos_bola;
 
     }else{
         if(MODO_DEBUG)
-            cout << "El tenista no ha llegado a la bola" << endl << endl;
+            cout << "Su rival no llega a la bola" << endl << endl;
 
-        if(posicion_tenista < pos_bola){
+        if(posicion_tenista < pos_bola)
             posicion_final = posicion_tenista + velocidad;
-        }else{
+        else
             posicion_final = posicion_tenista - velocidad;
-        }
     }
     return posicion_final;
 }
 int golpeo_bola(int posicion_tenista, int habilidad){
     int destino_bola, distancia;
 
+    if(MODO_DEBUG)
+        cout << endl << "El jugador dispara hacia la calle ";
+
     if(JUEGO_ALEATORIO){
-        destino_bola = rand()%ANCHO_PISTA + 1;
-        cout << endl;
-        if(MODO_DEBUG)
-            cout << endl << "El jugador dispara hacia la calle" << destino_bola << endl;
+        destino_bola = (rand()%ANCHO_PISTA) + 1;
+        cout << destino_bola << endl;
     }else{
         cin >> destino_bola;
         while(destino_bola < 1 || destino_bola > ANCHO_PISTA || cin.fail()){
@@ -376,7 +390,7 @@ int golpeo_bola(int posicion_tenista, int habilidad){
                 cout << "La bola llega a la calle " << destino_bola << endl;}
         }else{
             int random2 = rand()%2;
-            if(random2 == 0) destino_bola++; 
+            if(random2 == 0) destino_bola++;  //TODO: cambiar los nombres aqui
             else destino_bola--;
 
             if(MODO_DEBUG){
