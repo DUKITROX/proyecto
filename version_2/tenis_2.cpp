@@ -2,10 +2,6 @@
 #include <string>
 #include <ctime>
 #include <iomanip> 
-//TODO: meter lo de "Errores no forzados en estadistica"
-
-//TODO: funcion hayGanadorSet()
-
 using namespace std;
 
 const bool MODO_DEBUG = false, JUEGO_ALEATORIO = false;
