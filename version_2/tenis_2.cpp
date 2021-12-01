@@ -2,10 +2,11 @@
 #include <string>
 #include <ctime>
 #include <iomanip> 
+//TODO: meter lo de "Errores no forzados en estadistica"
 
 using namespace std;
 
-const bool MODO_DEBUG = true, JUEGO_ALEATORIO = true;
+const bool MODO_DEBUG = false, JUEGO_ALEATORIO = false;
 
 const int MIN_HABILIDAD = 1, MAX_HABILIDAD = 3;
 const int MIN_VELOCIDAD = 1, MAX_VELOCIDAD = 5;
@@ -18,17 +19,16 @@ typedef int t_conteo_golpes[ANCHO_PISTA + 2];
 
 int introducirDato(string dato, int min_dato, int max_dato);
 void introducir_tenista(string &iniciales, int &habilidad, int &velocidad);
-t_tenista saqueInicial();
+t_tenista saque_inicial();
 
 string puntos_a_string(t_puntos_juego puntuacion);
-void pintar_marcador(string nombre1, string nombre2, t_puntos_juego &puntos1, t_puntos_juego &puntos2, int juegos1, int juegos2, t_tenista serivico_para);
+void pintar_marcador(string nombre1, string nombre2, t_puntos_juego puntos1, t_puntos_juego puntos2, int juegos1, int juegos2, t_tenista servicio_para);
 void sumar_punto(t_puntos_juego &puntos);
 void actualizar_marcador(t_tenista ganador_punto, t_puntos_juego &puntos1, t_puntos_juego &puntos2, int &juegos1, int &juegos2, t_tenista &ganador_juego);
-void mostrar_estadistica(t_tenista tenista, t_conteo_golpes &golpes1, t_conteo_golpes &golpes2, int golpes_ganadores);
 
 void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_golpes golpes, int &golpes_ganados, int velocidad, int &pos_recibe, int &pos_bola, t_tenista &ganador_lance);
-void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, t_conteo_golpes golpes2, int &golopes_ganados2, t_tenista &ganador_punto);
-void jugar_juego(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, int &juegos1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, int &juegos2, t_conteo_golpes golpes2, int &golpes_ganados2, t_tenista &ganador_punto);
+void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, t_conteo_golpes golpes2, int &golpes_ganados2, t_tenista &ganador_punto);
+void jugar_juego(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, int &juegos1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, int &juegos2, t_conteo_golpes golpes2, int &golpes_ganados2, t_tenista &ganador_juego, t_puntos_juego &puntos1, t_puntos_juego &puntos2);
 
 void pintar_iniciales(string iniciales, int pos_tenista);
 void pintar_fila_fondo(int ancho_pista);
@@ -36,31 +36,23 @@ void pintar_campo(int ancho_pista, int largo_pista, int pos_bola, t_tenista teni
 void pintar_fila_medio(int ancho_pista);
 void pintar_peloteo(string nombre1, string nombre2, int pos_t1, int pos_t2, t_tenista bola_jugador, int pos_bola);
 
-int correTenista(int posicion_tenista, int velocidad, int posicion_bola);
-int golpeoBola(int posicion_tenista, int habilidad);
+void mostrar_estadistica(t_tenista tenista, string nombre_tenista, t_conteo_golpes golpes_tenista, int golpes_ganadores);
 
-void punto(t_puntos_juego &puntos);
-string juego(int habilidad1, int habilidad2, int velocidad1, int velocidad2, string nombre1, string nombre2);
-
-int main(){
-    srand(time(NULL));
-    string ini1, ini2;
-    int habilidad1, habilidad2;
-    int velocidad1, velocidad2;
-    t_puntos_juego puntos1, puntos2;
-    int juegos1, juegos2;
-
-    t_conteo_golpes golpes1, golpes2;
-    int golpes_ganadores1, golpes_ganadores2;
-}
+int corre_tenista(int posicion_tenista, int velocidad, int posicion_bola);
+int golpeo_bola(int posicion_tenista, int habilidad);
 
 int main(){
 
     srand(time(NULL));
-    string nombre1, nombre2, ganador_punto;
+    string nombre1, nombre2;
+    t_tenista tenista1 = TENISTA1, tenista2 = TENISTA2;
     t_puntos_juego puntos1 = NADA, puntos2 = NADA;
-    int habilidad1, habilidad2, velocidad1, velocidad2, juegos1 = 0, juegos2 = 0;;
-    bool ganador;
+    t_conteo_golpes golpes1, golpes2; //TODO: estan bien inicializados asi los arrays de puntos? o como se incializan?
+    int golpes_ganados1 = 0, golpes_ganados2 = 0;
+    int habilidad1, habilidad2, velocidad1, velocidad2, juegos1 = 0, juegos2 = 0;
+    bool ganador_set = false;
+    t_tenista servicio = saque_inicial();
+    t_tenista ganador_juego = NADIE;
 
     cout << "Bienvenidos al simulador de partidos de tenis" << endl;
     cout << endl;
@@ -73,35 +65,31 @@ int main(){
     cout << endl << "Datos del tenista 2" << endl;
     introducir_tenista(nombre2, habilidad2, velocidad2);
 
+
+
     //Juego
+    while(ganador_set == false){
+        jugar_juego(servicio, nombre1, habilidad1, velocidad1, juegos1, golpes1, golpes_ganados1, nombre2, habilidad2, velocidad2, juegos2, golpes2, golpes_ganados2, ganador_juego, puntos1, puntos2);
+        if(juegos1 - juegos2 >= 2 && juegos1 >= JUEGOS_SET)
+            ganador_set = TENISTA1;
+        else if(juegos2 - juegos1 >= 2 && juegos2 >= JUEGOS_SET)
+            ganador_set = TENISTA2;
+    }
+
+    cout << endl << "   " << nombre1 << " " << juegos1 << endl;
+    cout << "   " << nombre2 << " " << juegos2 << endl << endl;
+    string nombre_ganador;
+    ganador_set == TENISTA1 ? nombre_ganador = nombre1 : nombre_ganador = nombre2;
+    cout << nombre_ganador << " se hizo con el partido" << endl << endl << "Gracias por jugar" << endl;
     
     return 0;
 }
 
-void mostrar_estadistica(t_tenista tenista, string nombre_tenista, t_conteo_golpes &golpes_tenista, int golpes_ganadores){
-    string space = "       ";
-    int golpes_totales = 0;
-    for(int i = 0; i <= sizeof(golpes_tenista) ; i++){
-      golpes_totales += golpes_tenista[i];
-    }
-    cout << "Estadisticas de " << nombre_tenista << ":" << endl;
-    cout << setw(10) << "Golpes totales: "<< golpes_tenista << endl;
-    cout << setw(10) << "Golpes ganadores: " << golpes_ganadores << endl;
-    cout << setw(10) << "Errores no forzados: " << golpes_tenista[0] + golpes_tenista[8] << endl;
-    cout << setw(10) << "Distribucion de los golpes en la pista: " << endl;
-    cout << setw(15) << " Calle";
-    for(int i = 0; i <= ANCHO_PISTA; i++){
-        cout << i << space;
-    }
-    cout << endl << setw(15) << "   %";
-    for(int i = 0; i <= ANCHO_PISTA; i++){
-        cout << space << golpes_tenista[i]/golpes_totales;
-    }
-}
+
 
 int introducir_dato(string dato, int min, int max){
     int dato_i;
-    cout << "> Introduzca su " << dato << " (valor entre " << min << " y " << max << "): ";
+    cout << "   >Introduzca su " << dato << " (valor entre " << min << " y " << max << "): ";
     cin >> dato_i;
 
     while(dato_i < min || dato_i > max || cin.fail()){
@@ -118,7 +106,7 @@ void introducir_tenista(string &iniciales, int &habilidad, int &velocidad){
     habilidad = introducir_dato("habilidad", MIN_HABILIDAD, MAX_HABILIDAD);
     velocidad = introducir_dato("velocidad", MIN_VELOCIDAD, MAX_VELOCIDAD);
 }
-t_tenista saqueInicial(){
+t_tenista saque_inicial(){
     int random = rand()%2;
     t_tenista saque;
     if(random == 0)
@@ -150,16 +138,16 @@ string puntos_a_string(t_puntos_juego puntuacion){
     }
     return puntuacion_s;
 }
-void pintar_marcador(string nombre1, string nombre2, t_puntos_juego puntos1, t_puntos_juego puntos2, int juegos1, int juegos2, t_tenista serivico_para){
+void pintar_marcador(string nombre1, string nombre2, t_puntos_juego puntos1, t_puntos_juego puntos2, int juegos1, int juegos2, t_tenista servicio_para){
 
     string marcador1 = puntos_a_string(puntos1);
     string marcador2 = puntos_a_string(puntos2);
 
     cout << endl << "   " << nombre1 << "  " << juegos1 << " : " << marcador1 << " ";
-    if(serivico_para == TENISTA1) cout << '*';
+    if(servicio_para == TENISTA1) cout << '*';
 
     cout << endl << "   " << nombre2 << "  " << juegos2 << " : " << marcador2 << " ";
-    if(serivico_para == TENISTA2) cout << '*';
+    if(servicio_para == TENISTA2) cout << '*';
     cout << endl << endl;
 }
 void sumar_punto(t_puntos_juego &puntos){
@@ -192,6 +180,26 @@ void actualizar_marcador(t_tenista ganador_punto, t_puntos_juego &puntos1, t_pun
         puntos2 = CUARENTA;
     }
 }
+void mostrar_estadistica(t_tenista tenista, string nombre_tenista, t_conteo_golpes golpes_tenista, int golpes_ganadores){
+    string space = "       ";
+    int golpes_totales = 0;
+    for(int i = 0; i <= sizeof(golpes_tenista) ; i++){
+      golpes_totales += golpes_tenista[i];
+    }
+    cout << "Estadisticas de " << nombre_tenista << ":" << endl;
+    cout << setw(10) << "Golpes totales: "<< golpes_tenista << endl;
+    cout << setw(10) << "Golpes ganadores: " << golpes_ganadores << endl;
+    cout << setw(10) << "Errores no forzados: " << golpes_tenista[0] + golpes_tenista[8] << endl;
+    cout << setw(10) << "Distribucion de los golpes en la pista: " << endl;
+    cout << setw(15) << " Calle";
+    for(int i = 0; i <= ANCHO_PISTA; i++){
+        cout << i << space;
+    }
+    cout << endl << setw(15) << "   %";
+    for(int i = 0; i <= ANCHO_PISTA; i++){
+        cout << space << golpes_tenista[i]/golpes_totales;
+    }
+}
 
 void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_golpes golpes, int &golpes_ganados, int velocidad, int &pos_recibe, int &pos_bola, t_tenista &ganador_lance){
     ganador_lance = NADIE;
@@ -208,9 +216,10 @@ void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_
         else ganador_lance = TENISTA1;
     }
 }
-void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, t_conteo_golpes golpes2, int &golopes_ganados2, t_tenista &ganador_punto){
+void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, t_conteo_golpes golpes2, int &golpes_ganados2, t_tenista &ganador_punto){
     ganador_punto = NADIE;
     int habilidad_ataca, velocidad_defiende, golpes_ganados_ataca;
+    string nombre_ataca;
     t_conteo_golpes golpes_ataca;
     t_tenista tenista_ataca = servicio, tenista_defiende;
 
@@ -219,38 +228,68 @@ void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocid
     int pos_ataca, pos_defiende;
     while(ganador_punto == NADIE){
         if(tenista_ataca == TENISTA1){
+            nombre_ataca = nombre1;
             habilidad_ataca = habilidad1;
             velocidad_defiende = velocidad2;
 
             pos_ataca = pos1;
             pos_defiende = pos2;
 
-            for(int i = 0; i < ANCHO_PISTA + 2; i++){
-                golpes_ataca[i] = golpes1[i];
-            }
+            for(int i = 0; i < DIM_ARRAY_GOLPES; i++) golpes_ataca[i] = golpes1[i]; //Copiamos los golpes del tenista1
             golpes_ganados_ataca = golpes_ganados1;
 
             tenista_defiende = TENISTA2;
         }else{
+            nombre_ataca = nombre2;
             habilidad_ataca = habilidad2;
             velocidad_defiende = velocidad1;
 
             pos_ataca = pos2;
             pos_defiende = pos1;
 
+            for(int i = 0; i < DIM_ARRAY_GOLPES; i++) golpes_ataca[i] = golpes2[i]; //Copiamos los golpes del tenista2
+
             tenista_defiende = TENISTA1;
         }
         lance(tenista_ataca, nombre1, habilidad_ataca, golpes_ataca, golpes_ganados_ataca, velocidad_defiende, pos_defiende, pos_bola, ganador_punto);
+        cout << "Golpea " << nombre_ataca << endl << endl;
         pintar_peloteo(nombre1, nombre2, pos1, pos2, tenista_defiende, pos_bola);
 
         if(tenista_ataca == TENISTA1){
-
-        }else{
-
+            tenista_ataca = TENISTA2;
+            for(int i = 0; i < DIM_ARRAY_GOLPES; i++) golpes1[i] = golpes_ataca[i]; //Copiamos el golpe del lance a las stats del tenista1
+        }else if(tenista_ataca == TENISTA2){
+            tenista_ataca = TENISTA1;
+            for(int i = 0; i < DIM_ARRAY_GOLPES; i++) golpes2[i] = golpes_ataca[i]; //Copiamos el golpe del lance a las stats del tenista2
         }
     }
-    //actualizar_marcador();
+    ganador_punto = NADIE;
 }
+void jugar_juego(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, int &juegos1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, int &juegos2, t_conteo_golpes golpes2, int &golpes_ganados2, t_tenista &ganador_juego, t_puntos_juego &puntos1, t_puntos_juego &puntos2){
+    //TODO: estoy pidiendo los puntos por parametros porque no se como meterlos en actualizar marcador
+    t_tenista ganador_punto = NADIE;
+
+    string servicio_s;
+    servicio == TENISTA1 ? servicio_s = nombre1 : servicio_s = nombre2;
+
+    cout << endl << "Servicio para " << servicio_s << endl;
+    while(ganador_juego == NADIE){
+        pintar_marcador(nombre1, nombre2, puntos1, puntos2, juegos1, juegos2, servicio);
+        jugar_punto(servicio, nombre1, habilidad1, velocidad1, golpes1, golpes_ganados1, nombre2, habilidad2, velocidad2, golpes2, golpes_ganados2, ganador_punto);
+        actualizar_marcador(ganador_punto, puntos1, puntos2, juegos1, juegos2, ganador_juego);
+        if(servicio == TENISTA1)
+            servicio = TENISTA2;
+        else if(servicio == TENISTA2)
+            servicio = TENISTA1;
+    }
+    mostrar_estadistica(TENISTA1, nombre1, golpes1, golpes_ganados1);
+    mostrar_estadistica(TENISTA2, nombre2, golpes2, golpes_ganados2);
+    string nombre_ganador;
+    ganador_juego == TENISTA1 ? nombre_ganador = nombre1 : nombre_ganador = nombre2;
+    cout << "El ganador del juego es " << nombre_ganador << endl;
+    ganador_juego = NADIE;
+}
+
 
 void pintar_inciales(string iniciales, int pos_tenista){
     cout << " ";
@@ -335,7 +374,6 @@ int corre_tenista(int posicion_tenista, int velocidad, int pos_bola){
     }
     return posicion_final;
 }
-
 int golpeo_bola(int posicion_tenista, int habilidad){
     int destino_bola, distancia;
 
@@ -388,18 +426,18 @@ string juego(int habilidad1, int habilidad2, int velocidad1, int velocidad2, str
     string ganador_punto;
     int pos1 = 4, pos2 = 4, pos_bola = 4;
 
-    if(saqueInicial() == tenista1)
+    if(saque_inicial() == tenista1)
         saque1 = true;
     else
         saque1 = false;
 
     if(saque1){
-        pos_bola = golpeoBola(pos1, habilidad1);
-        pos2 = correTenista(pos2, velocidad2, pos_bola);
+        pos_bola = golpeo_bola(pos1, habilidad1);
+        pos2 = corre_tenista(pos2, velocidad2, pos_bola);
         turno1 = false;
     }else{
-        pos_bola = golpeoBola(pos2, habilidad2);
-        pos1 = correTenista(pos1, velocidad1, pos_bola);
+        pos_bola = golpeo_bola(pos2, habilidad2);
+        pos1 = corre_tenista(pos1, velocidad1, pos_bola);
         turno1 = true;
     }
 
@@ -412,8 +450,8 @@ string juego(int habilidad1, int habilidad2, int velocidad1, int velocidad2, str
                 ganador_punto = nombre2;
                 _ganador_punto = true;
             } else {
-                pos_bola = golpeoBola(pos1, habilidad1);
-                pos2 = correTenista(pos2, velocidad2, pos_bola);
+                pos_bola = golpeo_bola(pos1, habilidad1);
+                pos2 = corre_tenista(pos2, velocidad2, pos_bola);
                 turno1 = false;
             }
         } else {
@@ -423,8 +461,8 @@ string juego(int habilidad1, int habilidad2, int velocidad1, int velocidad2, str
                 ganador_punto = nombre1;
                 _ganador_punto = true;
             } else {
-                pos_bola = golpeoBola(pos2, habilidad2);
-                pos1 = correTenista(pos1, velocidad1, pos_bola);
+                pos_bola = golpeo_bola(pos2, habilidad2);
+                pos1 = corre_tenista(pos1, velocidad1, pos_bola);
                 turno1 = true;
             }
         }

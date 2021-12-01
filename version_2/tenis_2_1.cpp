@@ -16,9 +16,9 @@ string marcador(int puntuacion);
 void pintar_marcador(string nombre1, string nombre2, t_puntos_juego &puntos1, t_puntos_juego &puntos2, int juegos1, int juegos2, t_tenista serivico_para);
 void pintar_peloteo(string nombre1, string nombre2, int pos_t1, int pos_t2, t_tenista bola_jugador, int pos_bola);
 void pintar_campo(int ancho_pista, int largo_pista, int pos_bola, t_tenista tenista);
-int correTenista(int posicion_tenista, int velocidad, int posicion_bola);
+int corre_tenista(int posicion_tenista, int velocidad, int posicion_bola);
 int introducirDato(string dato, int min_dato, int max_dato);
-int golpeoBola(int posicion_tenista, int habilidad);
+int golpeo_bola(int posicion_tenista, int habilidad);
 t_tenista saqueInicial();
 void punto(t_puntos_juego &puntos);
 t_tenista juego(string nombre1, string nombre2, int velocidad1, int velocidad2, int habilidad1, int habilidad2, t_puntos_juego &puntos1, t_puntos_juego &puntos2, t_tenista turno);
@@ -101,8 +101,8 @@ t_tenista juego(string nombre1, string nombre2, int velocidad1, int velocidad2, 
                     cout << "Punto para " << nombre2 << "\n"<< endl;
                     ganador_punto = tenista2;
                 } else {
-                    pos_bola = golpeoBola(pos1, habilidad1);
-                    pos2 = correTenista(pos2, velocidad2, pos_bola);
+                    pos_bola = golpeo_bola(pos1, habilidad1);
+                    pos2 = corre_tenista(pos2, velocidad2, pos_bola);
                     turno = tenista2;
                 }
             } else {
@@ -111,8 +111,8 @@ t_tenista juego(string nombre1, string nombre2, int velocidad1, int velocidad2, 
                     cout << "Punto para " << nombre1 << "\n" << endl;
                     ganador_punto = tenista1;
                 } else {
-                    pos_bola = golpeoBola(pos2, habilidad2);
-                    pos1 = correTenista(pos1, velocidad1, pos_bola);
+                    pos_bola = golpeo_bola(pos2, habilidad2);
+                    pos1 = corre_tenista(pos1, velocidad1, pos_bola);
                     turno = tenista1;
                 }
             }
@@ -235,7 +235,7 @@ void pintar_campo(int ancho_pista, int largo_pista, int pos_bola, t_tenista teni
     }
 }
 
-int correTenista(int posicion_tenista, int velocidad, int posicion_bola)
+int corre_tenista(int posicion_tenista, int velocidad, int posicion_bola)
 {
     if( abs(posicion_bola - posicion_tenista) <= velocidad){
         posicion_tenista = posicion_bola;
@@ -269,7 +269,7 @@ int introducirDato(string dato, int min_dato, int max_dato){
     return dato_int;
 }
 
-int golpeoBola(int posicion_tenista, int habilidad){
+int golpeo_bola(int posicion_tenista, int habilidad){
     int destino, distancia, prob_acierto, aux, desicion;
 
     if(JUEGO_ALEATORIO){

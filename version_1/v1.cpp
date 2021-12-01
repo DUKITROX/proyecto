@@ -16,9 +16,9 @@ const bool DEBUG_MODE = true, JUEGO_ALEATORIO = true;
 const int ANCHO_PISTA = 7, MIN_HABILIDAD = 1, MAX_HABILIDAD = 3, MIN_VELOCIDAD = 1, MAX_VELOCIDAD = 5;
 
 string marcador(int puntuacion);
-int correTenista(int posicion_tenista, int velocidad, int posicion_bola);
+int corre_tenista(int posicion_tenista, int velocidad, int posicion_bola);
 int introducirDato(string dato, int min_dato, int max_dato);
-int golpeoBola(int posicion_tenista, int habilidad);
+int golpeo_bola(int posicion_tenista, int habilidad);
 string saqueInicial(string nombre1, string nombre2);
 string juego(int habilidad1, int habilidad2, int velocidad1, int velocidad2, string nombre1, string nombre2);
 
@@ -112,7 +112,7 @@ string marcador(int puntuacion)
     return punt;
 }
 
-int correTenista(int posicion_tenista, int velocidad, int posicion_bola)
+int corre_tenista(int posicion_tenista, int velocidad, int posicion_bola)
 {
     if( abs(posicion_bola - posicion_tenista) <= velocidad){
         posicion_tenista = posicion_bola;
@@ -147,7 +147,7 @@ int introducirDato(string dato, int min_dato, int max_dato){
     return dato_int;
 }
 
-int golpeoBola(int posicion_tenista, int habilidad){
+int golpeo_bola(int posicion_tenista, int habilidad){
     int destino, distancia, prob_acierto, aux, desicion;
 
     if(JUEGO_ALEATORIO){
@@ -214,12 +214,12 @@ string juego(int habilidad1, int habilidad2, int velocidad1, int velocidad2, str
         saque1 = false;
 
     if(saque1){
-        pos_bola = golpeoBola(pos1, habilidad1);
-        pos2 = correTenista(pos2, velocidad2, pos_bola);
+        pos_bola = golpeo_bola(pos1, habilidad1);
+        pos2 = corre_tenista(pos2, velocidad2, pos_bola);
         turno1 = false;
     }else{
-        pos_bola = golpeoBola(pos2, habilidad2);
-        pos1 = correTenista(pos1, velocidad1, pos_bola);
+        pos_bola = golpeo_bola(pos2, habilidad2);
+        pos1 = corre_tenista(pos1, velocidad1, pos_bola);
         turno1 = true;
     }
 
@@ -232,8 +232,8 @@ string juego(int habilidad1, int habilidad2, int velocidad1, int velocidad2, str
                 ganador_punto = nombre2;
                 _ganador_punto = true;
             } else {
-                pos_bola = golpeoBola(pos1, habilidad1);
-                pos2 = correTenista(pos2, velocidad2, pos_bola);
+                pos_bola = golpeo_bola(pos1, habilidad1);
+                pos2 = corre_tenista(pos2, velocidad2, pos_bola);
                 turno1 = false;
             }
         } else {
@@ -243,8 +243,8 @@ string juego(int habilidad1, int habilidad2, int velocidad1, int velocidad2, str
                 ganador_punto = nombre1;
                 _ganador_punto = true;
             } else {
-                pos_bola = golpeoBola(pos2, habilidad2);
-                pos1 = correTenista(pos1, velocidad1, pos_bola);
+                pos_bola = golpeo_bola(pos2, habilidad2);
+                pos1 = corre_tenista(pos1, velocidad1, pos_bola);
                 turno1 = true;
             }
         }
