@@ -15,19 +15,24 @@ typedef enum {NADIE, TENISTA1, TENISTA2} t_tenista;
 typedef enum {NADA , QUINCE, TREINTA, CUARENTA, VENTAJA} t_puntos_juego;
 typedef int t_conteo_golpes[DIM_ARRAY_GOLPES];
 
+//Funciones para el inicio del partido
 int introducirDato(string dato, int min_dato, int max_dato);
 void introducir_tenista(string &iniciales, int &habilidad, int &velocidad);
 t_tenista saque_inicial();
 
+//Funciones relativas al marcador
 string puntos_a_string(t_puntos_juego puntuacion);
 void pintar_marcador(string nombre1, string nombre2, t_puntos_juego puntos1, t_puntos_juego puntos2, int juegos1, int juegos2, t_tenista servicio_para);
+void pintar_marcador_final(string nombre1, string nombre2, int juegos1, int juegos2);
 void sumar_punto(t_puntos_juego &puntos);
 void actualizar_marcador(t_tenista ganador_punto, t_puntos_juego &puntos1, t_puntos_juego &puntos2, int &juegos1, int &juegos2, t_tenista &ganador_juego);
 
+//Funciones relativas al juego
 void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_golpes golpes, int &golpes_ganados, int velocidad, int &pos_recibe, int &pos_bola, t_tenista &ganador_lance);
 void jugar_punto(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, t_conteo_golpes golpes2, int &golpes_ganados2, t_tenista &ganador_punto);
 void jugar_juego(t_tenista servicio, string nombre1, int habilidad1, int velocidad1, int &juegos1, t_conteo_golpes golpes1, int &golpes_ganados1, string nombre2, int habilidad2, int velocidad2, int &juegos2, t_conteo_golpes golpes2, int &golpes_ganados2, t_tenista &ganador_juego);
 
+//Funciones relativas a mostrar el partido graficamente
 void pintar_iniciales(string iniciales, int pos_tenista);
 void pintar_fila_fondo();
 void pintar_campo_sin_bola();
@@ -35,24 +40,23 @@ void pintar_campo_con_bola(int pos_bola);
 void pintar_fila_medio();
 void pintar_peloteo(string nombre1, string nombre2, int pos_t1, int pos_t2, t_tenista bola_jugador, int pos_bola);
 
-void mostrar_estadistica(t_tenista tenista, string nombre_tenista, t_conteo_golpes golpes_tenista, int golpes_ganadores);
+//Funciones relativas a mostrar las estadisticas graficamente y revisar si el set ha concluido
+void mostrar_estadistica(string nombre_tenista, t_conteo_golpes golpes_tenista, int golpes_ganadores);
 void hay_ganador_set(int juegos1, int juegos2, t_tenista &ganador);
 
+//Funciones sobre la funcionalidad del movimiento del tenista
 int corre_tenista(int posicion_tenista, int velocidad, int posicion_bola);
 int golpeo_bola(int posicion_tenista, int habilidad);
 
 int main(){
-
     srand(time(NULL));
     string nombre1, nombre2;
-    t_tenista tenista1 = TENISTA1, tenista2 = TENISTA2;
     t_puntos_juego puntos1 = NADA, puntos2 = NADA;
     t_conteo_golpes golpes1 = {0}, golpes2 = {0};
     int golpes_ganados1 = 0, golpes_ganados2 = 0;
     int habilidad1, habilidad2, velocidad1, velocidad2, juegos1 = 0, juegos2 = 0;
-    t_tenista ganador_set = NADIE;
+    t_tenista ganador_juego = NADIE, ganador_set = NADIE;
     t_tenista servicio = saque_inicial();
-    t_tenista ganador_juego = NADIE;
 
     cout << endl << "Bienvenidos al simulador de partidos de tenis" << endl;
 
@@ -70,9 +74,7 @@ int main(){
         servicio == TENISTA1 ? servicio = TENISTA2 : servicio = TENISTA1;
         hay_ganador_set(juegos1, juegos2, ganador_set);
     }
-
-    cout << endl << "   " << nombre1 << " " << juegos1 << endl;
-    cout << "   " << nombre2 << " " << juegos2 << endl << endl;
+    pintar_marcador_final(nombre1, nombre2, juegos1, juegos2);
     string nombre_ganador;
     ganador_set == TENISTA1 ? nombre_ganador = nombre1 : nombre_ganador = nombre2;
     cout << nombre_ganador << " se hizo con el partido" << endl << endl << "Gracias por jugar" << endl << endl;
@@ -80,8 +82,7 @@ int main(){
     return 0;
 }
 
-
-
+//Funciones para el inicio del partido
 int introducir_dato(string dato, int min, int max){
     int dato_i;
     cout << "   >Introduzca su " << dato << " (valor entre " << min << " y " << max << "): ";
@@ -112,6 +113,7 @@ t_tenista saque_inicial(){
     return saque;
 }
 
+//Funciones relativas al marcador
 string puntos_a_string(t_puntos_juego puntuacion){
     string puntuacion_s;
     switch(puntuacion){
@@ -145,6 +147,10 @@ void pintar_marcador(string nombre1, string nombre2, t_puntos_juego puntos1, t_p
     if(servicio_para == TENISTA2) cout << '*';
     cout << endl << endl;
 }
+void pintar_marcador_final(string nombre1, string nombre2, int juegos1, int juegos2){
+    cout << endl << "   " << nombre1 << " " << juegos1 << endl;
+    cout << "   " << nombre2 << " " << juegos2 << endl << endl;
+}
 void sumar_punto(t_puntos_juego &puntos){
     int i = int(puntos);
     i++;
@@ -174,15 +180,16 @@ void actualizar_marcador(t_tenista ganador_punto, t_puntos_juego &puntos1, t_pun
     }
 }
 
+//Funciones relativas al juego
 void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_golpes golpes, int &golpes_ganados, int velocidad, int &pos_recibe, int &pos_bola, t_tenista &ganador_lance){
     ganador_lance = NADIE;
     if(JUEGO_ALEATORIO)
         //Si estas en windows comentas {cin.get();} y descomentas {system("pause");}
         //En caso de mac al reves, comentas {system("pause");}, y descomentas {cin.get();}
         //Esto es para que todos los golpes del partido no te salgan de golpe, sino que salgan uno a uno
+        system("pause");
+        //cin.get();
 
-        //system("pause");
-        cin.get();
     cout << "Golpea " << nombre << endl << endl;
     pos_bola = golpeo_bola(pos_bola, habilidad);
     golpes[pos_bola]++;
@@ -225,8 +232,8 @@ void jugar_juego(t_tenista servicio, string nombre1, int habilidad1, int velocid
 
     string servicio_s, ganador_punto_s;
     servicio == TENISTA1 ? servicio_s = nombre1 : servicio_s = nombre2;
-
     cout << endl << "Servicio para " << servicio_s << endl;
+
     pintar_marcador(nombre1, nombre2, puntos1, puntos2, juegos1, juegos2, servicio);
 
     while(ganador_juego == NADIE){
@@ -238,15 +245,15 @@ void jugar_juego(t_tenista servicio, string nombre1, int habilidad1, int velocid
         if(ganador_juego == NADIE)
             pintar_marcador(nombre1, nombre2, puntos1, puntos2, juegos1, juegos2, servicio);
     }
-    mostrar_estadistica(TENISTA1, nombre1, golpes1, golpes_ganados1);
-    mostrar_estadistica(TENISTA2, nombre2, golpes2, golpes_ganados2);
+    mostrar_estadistica(nombre1, golpes1, golpes_ganados1);
+    mostrar_estadistica(nombre2, golpes2, golpes_ganados2);
 
     string ganador_juego_s;
     ganador_juego == TENISTA1 ? ganador_juego_s = nombre1 : ganador_juego_s = nombre2;
-
     cout << endl << "El ganador del juego es " << ganador_juego_s << endl;
 }
 
+//Funciones relativas a mostrar el partido graficamente
 void pintar_inciales(string iniciales, int pos_tenista){
     cout << " ";
     for(int i = 1; i < pos_tenista; i++) {
@@ -306,7 +313,8 @@ void pintar_peloteo(string nombre1, string nombre2, int pos1, int pos2, t_tenist
     cout << endl;
 }
 
-void mostrar_estadistica(t_tenista tenista, string nombre, t_conteo_golpes golpes, int golpes_ganadores){
+//Funciones relativas a mostrar las estadisticas graficamente y revisar si el set ha concluido
+void mostrar_estadistica(string nombre, t_conteo_golpes golpes, int golpes_ganadores){
     int golpes_totales = 0, errores_no_forzados;
     double estadistica = 0;
     int caracteres_por_calle = 6, precision = 1;
@@ -340,6 +348,7 @@ void hay_ganador_set(int juegos1, int juegos2, t_tenista &ganador){
         ganador = TENISTA2;
 }
 
+//Funciones sobre la funcionalidad del movimiento del tenista
 int corre_tenista(int posicion_tenista, int velocidad, int pos_bola){
     int distancia = abs(posicion_tenista - pos_bola);
     int posicion_final;
@@ -366,7 +375,7 @@ int golpeo_bola(int posicion_tenista, int habilidad){
     if(MODO_DEBUG)
         cout << endl << "El jugador dispara hacia la calle ";
 
-    if(JUEGO_ALEATORIO){ //Elejie el propio programa a donde dispara la bola
+    if(JUEGO_ALEATORIO){ //El propio elije programa a donde dispara la bola
         destino_bola = (rand()%ANCHO_PISTA) + 1;
         if(MODO_DEBUG)
             cout << destino_bola << endl;
