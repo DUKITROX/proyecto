@@ -1,0 +1,30 @@
+//Fun.relativas a mostrar tenistas
+# mostrar
+# mostrarIniciales
+
+//Fun. relativas a manejar tenistas
+# bool cargar
+# void guardar
+# eliminarTenista
+# introducirTenista
+# buscarIniciales
+
+
+seleccionarTop4
+
+//Funciones relativas al juego
+jugarPartido
+jugarTorneo
+
+
+Ver la lista de tenistas
+Añadir un nuevo tenista
+Eliminar un tenista existente
+Jugar un partido entre dos tenistas a elegir
+Torneo entre 4 tenistas a elegir
+Torneo entre los 4 mejores tenistas
+Salir del programa
+
+
+0 1 2 3
+  *

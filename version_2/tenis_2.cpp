@@ -187,8 +187,8 @@ void lance(t_tenista tenista_que_golpea, string nombre, int habilidad, t_conteo_
         //Si estas en windows comentas {cin.get();} y descomentas {system("pause");}
         //En caso de mac al reves, comentas {system("pause");}, y descomentas {cin.get();}
         //Esto es para que todos los golpes del partido no te salgan de golpe, sino que salgan uno a uno
-        system("pause");
-        //cin.get();
+        //system("pause");
+        cin.get();
 
     cout << "Golpea " << nombre << endl << endl;
     pos_bola = golpeo_bola(pos_bola, habilidad);
@@ -335,7 +335,7 @@ void mostrar_estadistica(string nombre, t_conteo_golpes golpes, int golpes_ganad
 
     cout << endl << setfill(' ') << setw(caracteres_por_calle*2) << "%";
     for(int i = 0; i < DIM_ARRAY_GOLPES; i++){                          //<-- Mostramos las estadísticas por calle
-        estadistica = (golpes[i] / double(golpes_totales)) * 100;
+        estadistica = (golpes[i] / double(golpes_totales) * 100);
         cout << setfill(' ') << setw(caracteres_por_calle) << fixed << setprecision(precision) << estadistica;
     }
     cout << endl;

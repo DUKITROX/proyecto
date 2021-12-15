@@ -101,16 +101,6 @@ string marcador(int puntuacion)
     break;
     case 2:
         punt = "30";
-    break;
-    case 3:
-        punt = "40";
-    break;
-    case 4:
-        punt = "Ad";
-    break;
-    }
-    return punt;
-}
 
 int corre_tenista(int posicion_tenista, int velocidad, int posicion_bola)
 {
