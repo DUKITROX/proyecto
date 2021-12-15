@@ -42,8 +42,6 @@ struct t_lista_tenistas {
 
 //Funciones para el menu
 void mostrar_menu(int &opcion);
-void opcion1(const t_lista_tenistas &lista_t);
-void opcion2(t_lista_tenistas &lista_t);
 void opcion3(t_lista_tenistas &lista_t);
 void opcion4(t_lista_tenistas &lista_t);
 void opcion5();
@@ -104,7 +102,7 @@ int main(){
         switch (opcion)
         {
         case 1:
-            opcion1(lista_t);
+            mostrar(lista_t);
             break;
         case 2:
             introducir_tenista(lista_t);
@@ -156,9 +154,7 @@ void mostrar_menu(int &opcion){
     cout << "Opcion: ";
     cin >> opcion;
 }
-void opcion1(const t_lista_tenistas &lista_t){
-    mostrar(lista_t);
-}
+
 void opcion2(t_lista_tenistas &lista_t){
     introducir_tenista(lista_t);
 }
