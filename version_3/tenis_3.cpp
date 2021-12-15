@@ -20,7 +20,7 @@ typedef enum {NADA , QUINCE, TREINTA, CUARENTA, VENTAJA} t_puntos_juego;
 typedef int t_conteo_golpes[DIM_ARRAY_GOLPES];
 
 
-struct t_datos_partido{
+typedef struct t_datos_partido{
     int posicion = ANCHO_PISTA / 2 + 1;
     t_puntos_juego puntos = NADA;
     int juegos = 0;
@@ -41,7 +41,7 @@ struct t_lista_tenistas {
 };
 
 //Funciones para el menu
-void mostrar_menu(int &opcion);
+void mostrar_menu(int &opcion); //TODO: quitar funciones de opciones
 void opcion1(const t_lista_tenistas &lista_t);
 void opcion2(t_lista_tenistas &lista_t);
 void opcion3(t_lista_tenistas &lista_t);
@@ -173,7 +173,7 @@ void opcion4(t_lista_tenistas &lista_t){
     t_datos_tenista tenista1, tenista2;
     t_tenista ganador_partido = NADIE;
     do{
-        cout << "Introduce las inciales del tenista1: ";
+        cout << "Introduce las inciales del tenista 1: ";
         cin >> tenista1.iniciales;
         if(buscar_iniciales(lista_t, tenista1.iniciales) == -1)
             cout << "   No existe ningun tenista con esas iniciales" << endl;
