@@ -20,7 +20,7 @@ typedef enum {NADA , QUINCE, TREINTA, CUARENTA, VENTAJA} t_puntos_juego;
 typedef int t_conteo_golpes[DIM_ARRAY_GOLPES];
 
 
-typedef struct t_datos_partido{
+struct t_datos_partido{
     int posicion = ANCHO_PISTA / 2 + 1;
     t_puntos_juego puntos = NADA;
     int juegos = 0;
@@ -57,6 +57,7 @@ void eliminar_tenista(t_lista_tenistas &lista_t, string iniciales);
 string pedir_inicales_tenista(int num);
 
 //Funciones para el inicio del partido
+string introducir_iniciales();
 int introducir_dato(string dato, int min_dato, int max_dato);
 void introducir_tenista(t_lista_tenistas &lista_t);
 t_tenista saque_inicial();
@@ -216,6 +217,8 @@ bool cargar(t_lista_tenistas &lista_t){
             archivo.get(aux);
             lista_t.contador++;
         }
+    }else{
+        //TODO: poner mensaje en caso de que no se haya podido abrir el archivo
     }
     archivo.close();
     return ok;
@@ -275,15 +278,30 @@ int introducir_dato(string dato, int min, int max){
     return dato_i;
 }
 void introducir_tenista(t_lista_tenistas &lista_t){
+    string iniciales;
     if(lista_t.contador < 10){
-        cout << "   >Introduce sus iniciales (3 letras): ";
-        cin >> lista_t.tenistas[lista_t.contador].iniciales;
+        lista_t.tenistas[lista_t.contador].iniciales = introducir_iniciales();
         lista_t.tenistas[lista_t.contador].habilidad = introducir_dato("habilidad", MIN_HABILIDAD, MAX_HABILIDAD);
         lista_t.tenistas[lista_t.contador].velocidad = introducir_dato("velocidad", MIN_VELOCIDAD, MAX_VELOCIDAD);
         cout << "Nuevo tenista creado" << endl << endl;
         lista_t.contador++;
     }
 }
+
+string introducir_iniciales(){
+    bool done = false;
+    string iniciales;
+    while(!done){
+        cout << "   >Introduce sus iniciales (3 letras): ";
+        cin >> iniciales;
+        if(iniciales.length() <= 3)
+            done = true;
+        else
+            cout << "   Solo puede contener 3 letras, vuelva a introducir sus iniciales." << endl;
+    }
+    return iniciales;
+}
+
 t_tenista saque_inicial(){
     int random = rand()%2;
     t_tenista saque;
@@ -319,13 +337,10 @@ string puntos_a_string(t_puntos_juego puntuacion){
 }
 void pintar_marcador(string iniciales1, string iniciales2, const t_datos_partido &datos_t1, const t_datos_partido &datos_t2, t_tenista servicio_para){
 
-    string marcador1 = puntos_a_string(datos_t1.puntos);
-    string marcador2 = puntos_a_string(datos_t2.puntos);
-
-    cout << endl << "   " << iniciales1 << "  " << datos_t1.juegos << " : " << marcador1 << " ";
+    cout << endl << "   " << iniciales1 << "  " << datos_t1.juegos << " : " << puntos_a_string(datos_t1.puntos) << " ";
     if(servicio_para == TENISTA1) cout << '*';
 
-    cout << endl << "   " << iniciales2 << "  " << datos_t2.juegos << " : " << marcador2 << " ";
+    cout << endl << "   " << iniciales2 << "  " << datos_t2.juegos << " : " << puntos_a_string(datos_t2.puntos) << " ";
     if(servicio_para == TENISTA2) cout << '*';
     cout << endl << endl;
 }
@@ -554,7 +569,10 @@ void mostrar_estadistica(string nombre, t_conteo_golpes golpes, int golpes_ganad
     double estadistica = 0;
     int caracteres_por_calle = 6, precision = 1;
 
-    for(int i = 0; i < DIM_ARRAY_GOLPES ; i++) golpes_totales += golpes[i];
+    for(int i = 0; i < DIM_ARRAY_GOLPES ; i++){
+        golpes_totales += golpes[i];
+    }
+
     errores_no_forzados = golpes[0] + golpes[DIM_ARRAY_GOLPES-1];
 
     cout << endl;
