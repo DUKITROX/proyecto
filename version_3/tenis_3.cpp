@@ -233,6 +233,7 @@ void guardar(const t_lista_tenistas &lista_t){
         archivo << lista_t.tenistas[i].partidos_ganados << " ";
         archivo << lista_t.tenistas[i].partidos_perdidos << endl;
     }
+    cout << "\r\b";
     archivo.close();
 }
 int buscar_iniciales(const t_lista_tenistas &lista_t, string iniciales){
