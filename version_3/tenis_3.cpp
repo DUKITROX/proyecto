@@ -216,6 +216,8 @@ bool cargar(t_lista_tenistas &lista_t){
             archivo.get(aux);
             lista_t.contador++;
         }
+    }else{
+        //TODO: poner mensaje en caso de que no se haya podido abrir el archivo
     }
     archivo.close();
     return ok;
