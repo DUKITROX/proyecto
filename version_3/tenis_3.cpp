@@ -464,7 +464,7 @@ void seleccionarTop4(const t_lista_tenistas &listaT, int &indT1, int &indT2, int
 
 	indT1 = pos1, indT2 = pos2, indT3 = pos3, indT4 = pos4;
 
-	cout << tenista1.iniciales << "  " << tenista2.iniciales << "  " << tenista3.iniciales << "  " << tenista4.iniciales << endl;
+	//cout << tenista1.iniciales << "  " << tenista2.iniciales << "  " << tenista3.iniciales << "  " << tenista4.iniciales << endl;
 }
 
 int compara(int val1, int val2) {
