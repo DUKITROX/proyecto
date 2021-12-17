@@ -96,7 +96,7 @@ void hay_ganador_set(int juegos1, int juegos2, t_tenista &ganador);
 int corre_tenista(int posicion_tenista, int velocidad, int posicion_bola);
 int golpeo_bola(int posicion_tenista, int habilidad);
 
-bool es_diferente(int num1, int num2, int num3, int num4);
+int compara(int val1, int val2);
 
 int main(){
     srand(time(NULL));
@@ -345,39 +345,92 @@ t_tenista saque_inicial(){
     return saque;
 }
 
-void seleccionarTop4(const t_lista_tenistas &listaT, int &indT1, int &indT2, int &indT3, int &indT4){
 
-    int max1 = 0, max2 = 0, max3 = 0, max4 = 0;
-    bool done = false;
-        //Buscar indT1
-        for(int i = 0; i < listaT.contador; i++){
-            if(listaT.tenistas[i].partidos_ganados > max1){
-                max1 = listaT.tenistas[i].partidos_ganados;
-                indT1 = i;
-            }
-        }
-        //Buscar indT2
-        for(int j = 0; j < listaT.contador; j++){
-            if(listaT.tenistas[j].partidos_ganados <= max1 && listaT.tenistas[j].partidos_ganados > max2 && es_diferente(indT2, indT1, indT3, indT4)){
-                max2 = listaT.tenistas[j].partidos_ganados;
-                indT2 = j;
-            }
-        }
-        //Buscar indT3
-        for(int k = 0; k < listaT.contador; k++){
-            if(listaT.tenistas[k].partidos_ganados <= max2 && listaT.tenistas[k].partidos_ganados > max3 && es_diferente(indT3, indT2, indT1, indT4)){
-                max3 = listaT.tenistas[k].partidos_ganados;
-                indT3 = k;
-            }
-        }
-        //Buscar indT4
-        for(int i = 0; i < listaT.contador; i++){
-            if(listaT.tenistas[i].partidos_ganados <= max3 && listaT.tenistas[i].partidos_ganados > max4 && es_diferente(indT4, indT2, indT3, indT1)){
-                max4 = listaT.tenistas[i].partidos_ganados;
-                indT4 = i;
-            }
-        }
+void seleccionarTop4(const t_lista_tenistas &listaT, int &indT1, int &indT2, int &indT3, int &indT4)
+{
+	t_datos_tenista tenista1, tenista2, tenista3, tenista4;
+	t_tenista ganador;
+
+	int comparacion = 0, num1 = 0, num2 = 0, num3 = 0, num4 = 0, pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+	for (int i = 0; i < listaT.contador; ++i) {
+
+		comparacion = compara(listaT.tenistas[i].partidos_ganados, num1);
+
+		if (comparacion == 1 || comparacion == 0) {
+			num4 = num3;
+			num3 = num2;
+			num2 = num1;
+			num1 = listaT.tenistas[i].partidos_ganados;
+			tenista4.iniciales = tenista3.iniciales;
+			tenista3.iniciales = tenista2.iniciales;
+			tenista2.iniciales = tenista1.iniciales;
+			tenista1.iniciales = listaT.tenistas[i].iniciales;
+
+			pos4 = pos3;
+			pos3 = pos2;
+			pos2 = pos1;
+			pos1 = i;
+		}
+		else if (comparacion == -1) {
+			comparacion = compara(listaT.tenistas[i].partidos_ganados, num2);
+
+			if (comparacion == 1 || comparacion == 0) {
+				num4 = num3;
+				num3 = num2;
+				num2 = listaT.tenistas[i].partidos_ganados;
+				tenista4.iniciales = tenista3.iniciales;
+				tenista3.iniciales = tenista2.iniciales;
+				tenista2.iniciales = listaT.tenistas[i].iniciales;
+
+				pos4 = pos3;
+				pos3 = pos2;
+				pos2 = i;
+			}
+			else if (comparacion == -1) {
+				comparacion = compara(listaT.tenistas[i].partidos_ganados, num3);
+
+				if (comparacion == 1 || comparacion == 0) {
+					num4 = num3;
+					num3 = listaT.tenistas[i].partidos_ganados;
+					tenista4.iniciales = tenista3.iniciales;
+					tenista3.iniciales = listaT.tenistas[i].iniciales;
+
+					pos4 = pos3;
+					pos3 = i;
+				}
+				else if (comparacion == -1) {
+					comparacion = compara(listaT.tenistas[i].partidos_ganados, num4);
+
+					if (comparacion == 1 || comparacion == 0) {
+						num4 = listaT.tenistas[i].partidos_ganados;
+						tenista4.iniciales = listaT.tenistas[i].iniciales;
+
+						pos4 = i;
+					}
+				}
+			}
+		}
+	}
+
+	indT1 = pos1, indT2 = pos2, indT3 = pos3, indT4 = pos4;
+
+	//cout << tenista1.iniciales << "  " << tenista2.iniciales << "  " << tenista3.iniciales << "  " << tenista4.iniciales << endl;
 }
+
+int compara(int val1, int val2) {
+	int resultado = 0;
+
+		if (val1 == val2)
+			resultado = 0;
+		else if (val1 < val2)
+			resultado = -1;
+		else
+			resultado = 1;
+
+	return resultado;
+}
+
 
 //Funciones relativas al marcador
 string puntos_a_string(t_puntos_juego puntuacion){
@@ -738,6 +791,7 @@ int golpeo_bola(int posicion_tenista, int habilidad){
     }
     return destino_bola;
 }
+<<<<<<< HEAD
 
 //TODO:
 bool es_diferente(int num1, int num2, int num3, int num4){
@@ -746,3 +800,5 @@ bool es_diferente(int num1, int num2, int num3, int num4){
     else
         return false;
 }
+=======
+>>>>>>> d6ac0a22a3e9639def47dfbe357b240a72672cb9
