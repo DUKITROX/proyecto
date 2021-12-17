@@ -359,41 +359,7 @@ t_tenista saque_inicial(){
 
     return saque;
 }
-/*
-void seleccionarTop4(const t_lista_tenistas &listaT, int &indT1, int &indT2, int &indT3, int &indT4){
 
-    int max1 = 0, max2 = 0, max3 = 0, max4 = 0;
-    bool done = false;
-        //Buscar indT1
-        for(int i = 0; i < listaT.contador; i++){
-            if(listaT.tenistas[i].partidos_ganados > max1){
-                max1 = listaT.tenistas[i].partidos_ganados;
-                indT1 = i;
-            }
-        }
-        //Buscar indT2
-        for(int j = 0; j < listaT.contador; j++){
-            if(listaT.tenistas[j].partidos_ganados <= max1 && listaT.tenistas[j].partidos_ganados > max2 && es_diferente(indT2, indT1, indT3, indT4)){
-                max2 = listaT.tenistas[j].partidos_ganados;
-                indT2 = j;
-            }
-        }
-        //Buscar indT3
-        for(int k = 0; k < listaT.contador; k++){
-            if(listaT.tenistas[k].partidos_ganados <= max2 && listaT.tenistas[k].partidos_ganados > max3 && es_diferente(indT3, indT2, indT1, indT4)){
-                max3 = listaT.tenistas[k].partidos_ganados;
-                indT3 = k;
-            }
-        }
-        //Buscar indT4
-        for(int i = 0; i < listaT.contador; i++){
-            if(listaT.tenistas[i].partidos_ganados <= max3 && listaT.tenistas[i].partidos_ganados > max4 && es_diferente(indT4, indT2, indT3, indT1)){
-                max4 = listaT.tenistas[i].partidos_ganados;
-                indT4 = i;
-            }
-        }
-}
-*/
 
 void seleccionarTop4(const t_lista_tenistas &listaT, int &indT1, int &indT2, int &indT3, int &indT4)
 {
