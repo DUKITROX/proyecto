@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <ctime>
 #include <iomanip> 
 using namespace std;
 //TODO: preguntar por todos los warnings que me salen por inicializar cosas de los struct
@@ -103,21 +102,24 @@ int main(){
     srand(time(NULL));
     t_lista_tenistas lista_t;
     cargar(lista_t); //Cargamos los tenistas del fichero
-    int opcion;
+    int opcion = -1;
     while(opcion != 0){
         mostrar_menu(opcion);
         switch (opcion)
         {
         case 1:
-            opcion1(lista_t);
+            mostrar(lista_t);
             break;
         case 2:
             introducir_tenista(lista_t);
             break;
-        case 3: //TODO: que hacer si las iniciales no existen, vuelves a preguntar o te sales?
-            //TODO: esta bien hecho asi lo de eliminar el tenista??
-            opcion3(lista_t);
-            break;
+        case 3:{
+            mostrar_iniciales(lista_t);
+            string inciales;
+            cout << "Introducir las inciales del tenista a eliminar: ";
+            cin >> inciales;
+            eliminar_tenista(lista_t, inciales);
+        }
         case 6:
             opcion6(lista_t);
         }
@@ -162,19 +164,6 @@ void mostrar_menu(int &opcion){
     cout << "Opcion: ";
     cin >> opcion;
 }
-void opcion1(const t_lista_tenistas &lista_t){
-    mostrar(lista_t);
-}
-void opcion2(t_lista_tenistas &lista_t){
-    introducir_tenista(lista_t);
-}
-void opcion3(t_lista_tenistas &lista_t){
-    mostrar_iniciales(lista_t);
-    string inciales;
-    cout << "Introducir las inciales del tenista a eliminar: ";
-    cin >> inciales;
-    eliminar_tenista(lista_t, inciales);
-}
 void opcion4(t_lista_tenistas &lista_t){
     t_datos_tenista tenista1, tenista2;
     t_tenista ganador_partido = NADIE;
@@ -199,10 +188,6 @@ void opcion4(t_lista_tenistas &lista_t){
     cout << "Comienza el partido" << endl << endl;
     jugar_partido(tenista1, tenista2, ganador_partido);
 }
-void opcion5(){
-
-}
-
 void opcion6(t_lista_tenistas &listaT){
     int indT1 = 0, indT2 = 0, indT3 = 0, indT4 = 0;
     seleccionarTop4(listaT, indT1, indT2, indT3, indT4);
@@ -754,6 +739,7 @@ int golpeo_bola(int posicion_tenista, int habilidad){
     return destino_bola;
 }
 
+//TODO:
 bool es_diferente(int num1, int num2, int num3, int num4){
     if(num1 != num2 && num1 != num3 && num1 != num4)
         return true;
