@@ -97,7 +97,7 @@ void hay_ganador_set(int juegos1, int juegos2, t_tenista &ganador);
 int corre_tenista(int posicion_tenista, int velocidad, int posicion_bola);
 int golpeo_bola(int posicion_tenista, int habilidad);
 
-bool es_diferente(int num1, int num2, int num3, int num4);
+int compara(int val1, int val2);
 
 int main(){
     srand(time(NULL));
@@ -359,7 +359,7 @@ t_tenista saque_inicial(){
 
     return saque;
 }
-
+/*
 void seleccionarTop4(const t_lista_tenistas &listaT, int &indT1, int &indT2, int &indT3, int &indT4){
 
     int max1 = 0, max2 = 0, max3 = 0, max4 = 0;
@@ -393,6 +393,93 @@ void seleccionarTop4(const t_lista_tenistas &listaT, int &indT1, int &indT2, int
             }
         }
 }
+*/
+
+void seleccionarTop4(const t_lista_tenistas &listaT, int &indT1, int &indT2, int &indT3, int &indT4)
+{
+	t_datos_tenista tenista1, tenista2, tenista3, tenista4;
+	t_tenista ganador;
+
+	int comparacion = 0, num1 = 0, num2 = 0, num3 = 0, num4 = 0, pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+	for (int i = 0; i < listaT.contador; ++i) {
+
+		comparacion = compara(listaT.tenistas[i].partidos_ganados, num1);
+
+		if (comparacion == 1 || comparacion == 0) {
+			num4 = num3;
+			num3 = num2;
+			num2 = num1;
+			num1 = listaT.tenistas[i].partidos_ganados;
+			tenista4.iniciales = tenista3.iniciales;
+			tenista3.iniciales = tenista2.iniciales;
+			tenista2.iniciales = tenista1.iniciales;
+			tenista1.iniciales = listaT.tenistas[i].iniciales;
+
+			pos4 = pos3;
+			pos3 = pos2;
+			pos2 = pos1;
+			pos1 = i;
+		}
+		else if (comparacion == -1) {
+			comparacion = compara(listaT.tenistas[i].partidos_ganados, num2);
+
+			if (comparacion == 1 || comparacion == 0) {
+				num4 = num3;
+				num3 = num2;
+				num2 = listaT.tenistas[i].partidos_ganados;
+				tenista4.iniciales = tenista3.iniciales;
+				tenista3.iniciales = tenista2.iniciales;
+				tenista2.iniciales = listaT.tenistas[i].iniciales;
+
+				pos4 = pos3;
+				pos3 = pos2;
+				pos2 = i;
+			}
+			else if (comparacion == -1) {
+				comparacion = compara(listaT.tenistas[i].partidos_ganados, num3);
+
+				if (comparacion == 1 || comparacion == 0) {
+					num4 = num3;
+					num3 = listaT.tenistas[i].partidos_ganados;
+					tenista4.iniciales = tenista3.iniciales;
+					tenista3.iniciales = listaT.tenistas[i].iniciales;
+
+					pos4 = pos3;
+					pos3 = i;
+				}
+				else if (comparacion == -1) {
+					comparacion = compara(listaT.tenistas[i].partidos_ganados, num4);
+
+					if (comparacion == 1 || comparacion == 0) {
+						num4 = listaT.tenistas[i].partidos_ganados;
+						tenista4.iniciales = listaT.tenistas[i].iniciales;
+
+						pos4 = i;
+					}
+				}
+			}
+		}
+	}
+
+	indT1 = pos1, indT2 = pos2, indT3 = pos3, indT4 = pos4;
+
+	cout << tenista1.iniciales << "  " << tenista2.iniciales << "  " << tenista3.iniciales << "  " << tenista4.iniciales << endl;
+}
+
+int compara(int val1, int val2) {
+	int resultado = 0;
+
+		if (val1 == val2)
+			resultado = 0;
+		else if (val1 < val2)
+			resultado = -1;
+		else
+			resultado = 1;
+
+	return resultado;
+}
+
 
 //Funciones relativas al marcador
 string puntos_a_string(t_puntos_juego puntuacion){
@@ -752,11 +839,4 @@ int golpeo_bola(int posicion_tenista, int habilidad){
         }
     }
     return destino_bola;
-}
-
-bool es_diferente(int num1, int num2, int num3, int num4){
-    if(num1 != num2 && num1 != num3 && num1 != num4)
-        return true;
-    else
-        return false;
 }
