@@ -5,10 +5,7 @@
 using namespace std;
 
 //TODO:
-//funcion cargar: hace falta con aux?
-//funcion jugar partido
 //funcion jugar torneo
-//funcoin top4
 //main
 //funcion pedir_tenista
 //para la funcion guardar, lo que yo hago es eliminar todo lo que haya dentro y metrs lo nuevo, esta bien asi? o hay que simplemente añadir?
@@ -53,8 +50,8 @@ void mostrar_menu(int &opcion); //TODO: quitar funciones de opciones
 //Funciones para manejar tenistas
 bool cargar(t_lista_tenistas &lista_t);
 void guardar(const t_lista_tenistas &lista_t);
-void eliminar_tenista(t_lista_tenistas &lista_t, string iniciales);
 int buscar_iniciales(const t_lista_tenistas &lista_t, string iniciales);
+void eliminar_tenista(t_lista_tenistas &lista_t, string iniciales);
 int pedir_tenista(const t_lista_tenistas &lista_t, int num);
 void seleccionarTop4(const t_lista_tenistas &lista_t, int &ind_t1, int &ind_t2, int &ind_t3, int &ind_t4);
 
@@ -75,7 +72,7 @@ void actualizar_marcador(t_tenista ganador_punto, t_datos_partido &datos_t1, t_d
 void lance(t_tenista bola_para, t_datos_tenista &tenista_golpea, t_datos_tenista &tenista_recibe, int &pos_bola, t_tenista &ganador_lance);
 void jugar_punto(t_datos_tenista &tenista1, t_datos_tenista &tenista2, t_tenista servicio_para, t_tenista &ganador_punto);
 void jugar_juego(t_datos_tenista &tenista1, t_datos_tenista &tenista2, t_tenista servicio_para, t_tenista &ganador_juego);
-void jugar_partido(t_datos_tenista &tenista1, t_datos_tenista &tenista2, t_tenista& ganador_partido);
+t_tenista jugar_partido(t_datos_tenista &tenista1, t_datos_tenista &tenista2);
 void jugar_torneo(t_lista_tenistas &lista_t, int ind_t1, int ind_t2, int ind_t3, int ind_t4);
 
 //Funciones relativas a mostrar el partido graficamente
@@ -91,7 +88,7 @@ void mostrar(const t_lista_tenistas lista_t);
 void mostrar_iniciales(const t_lista_tenistas lista_t);
 
 //Funciones relativas a mostrar las estadisticas graficamente y revisar si el set ha concluido
-void mostrar_estadistica(string nombre_tenista, t_conteo_golpes golpes_tenista, int golpes_ganadores);
+void mostrar_estadistica(string nombre_tenista, const t_conteo_golpes golpes_tenista, int golpes_ganadores);
 void hay_ganador_set(int juegos1, int juegos2, t_tenista &ganador);
 
 //Funciones sobre la funcionalidad del movimiento del tenista
@@ -101,8 +98,13 @@ int golpeo_bola(int posicion_tenista, int habilidad);
 int main(){
     srand(time(NULL));
     t_lista_tenistas lista_t;
-    cargar(lista_t); //Cargamos los tenistas del fichero
+    cargar(lista_t);
     int opcion = -1;
+
+    cout << "---------------------" << endl;
+    cout << "SIMULADOR DE TENIS V3" << endl;
+    cout << "---------------------" << endl;
+
     while(opcion != 0){
         mostrar_menu(opcion);
         switch (opcion){
@@ -113,36 +115,38 @@ int main(){
             introducir_tenista(lista_t);
             break;
         case 3:{
-            mostrar_iniciales(lista_t);
-            string inciales;
-            cout << "Introducir las inciales del tenista a eliminar: ";
-            cin >> inciales;
-            while(buscar_iniciales(lista_t, iniciales) == -1){
-                cout << "   No existe ningun tenista con esas iniciales" << endl;
-                cout << "Introducir las inciales del tenista a eliminar: ";
+            if(lista_t.contador == 0){
+                cout << "La lista de tenistas esta vacia" << endl << endl;
+            }else{
+                mostrar_iniciales(lista_t);
+                string iniciales;
+                cout << "Introduce las iniciales del tenista a eliminar: ";
                 cin >> iniciales;
+                eliminar_tenista(lista_t, iniciales);
             }
-            eliminar_tenista(lista_t, iniciales);
             break;
-        }
-        case 4:{
-            int posicion1, posicion2;
-            posicion1 = pedir_tenista(lista_t, 1);
-            posicion2 = pedir_tenista(lista_t, 2);
-            while(posicion1 == posicion2){
-                cout << "   Tenista repetido. Elija otro" << endl;
+        }case 4:{
+            if(lista_t.contador < 2){
+                cout << "No hay tenistas suficientes para un partido, introduzca alguno antes" << endl << endl;
+            }else{
+                mostrar_iniciales(lista_t);
+                int posicion1, posicion2;
+                posicion1 = pedir_tenista(lista_t, 1);
                 posicion2 = pedir_tenista(lista_t, 2);
+                while(posicion1 == posicion2){
+                    cout << "   Tenista repetido. Elija otro" << endl;
+                    posicion2 = pedir_tenista(lista_t, 2);
+                }
+                jugar_partido(lista_t.tenistas[posicion1], lista_t.tenistas[posicion2]);
             }
-            t_tenista ganador_partido;
-
-            jugar_partido(lista_t.tenistas[posicion1], lista_t.tenistas[posicion2], ganador_partido);
             break;
         }
         case 5:{
-            int posicion1, posicion2, posicion3, posicion4;
-            if(lista_t.contador < 4)
-                cout << "No hay suficientes tenistas para un torneo"
-            else{
+            if(lista_t.contador < 4){
+                cout << "No hay tenistas suficientes para un torneo, introduzca alguno antes" << endl << endl;
+            }else{
+                mostrar_iniciales(lista_t);
+                int posicion1, posicion2, posicion3, posicion4;
                 posicion1 = pedir_tenista(lista_t, 1);
                 posicion2 = pedir_tenista(lista_t, 2);
                 while(posicion1 == posicion2){
@@ -165,9 +169,14 @@ int main(){
             break;
         }
         case 6:
-            int posicion1, posicion2, posicion3, posicion4;
-            seleccionarTop4(lista_t, posicion1, posicion2, posicion3, posicion4);
-            jugar_torneo(lista_t, posicion1, posicion2, posicion3, posicion4);
+            if(lista_t.contador < 4){
+                cout << "No hay tenistas suficientes para un torneo, introduzca alguno antes" << endl;
+            }else{
+                int posicion1, posicion2, posicion3, posicion4;
+                seleccionarTop4(lista_t, posicion1, posicion2, posicion3, posicion4);
+                jugar_torneo(lista_t, posicion1, posicion2, posicion3, posicion4);
+            }
+            break;
         }
     }
     guardar(lista_t);
@@ -184,46 +193,48 @@ void mostrar_menu(int &opcion){
     cout << "<0> Salir" << endl << endl;
     cout << "Opcion: ";
     cin >> opcion;
+    cout << endl;
 }
 
 //Funciones para manejar tenistas
 bool cargar(t_lista_tenistas &lista_t){
-    //TODO: asi esta bien? o mejor cargar con un archivo auxiliar?
     bool ok = false;
     ifstream archivo;
-    char aux;
+    char c;
+    t_datos_tenista tenista;
 
     archivo.open("tenistas.txt");
 
     if(archivo.is_open()){
         ok = true;
         while(!archivo.eof() && lista_t.contador < DIM_ARRAY_TENISTAS){
-            archivo >> lista_t.tenistas[lista_t.contador].iniciales;
-            archivo >> lista_t.tenistas[lista_t.contador].habilidad;
-            archivo >> lista_t.tenistas[lista_t.contador].velocidad;
-            archivo >> lista_t.tenistas[lista_t.contador].partidos_ganados;
-            archivo >> lista_t.tenistas[lista_t.contador].partidos_perdidos;
-            archivo.get(aux);
+            archivo >> tenista.iniciales;
+            archivo >> tenista.habilidad;
+            archivo >> tenista.velocidad;
+            archivo >> tenista.partidos_ganados;
+            archivo >> tenista.partidos_perdidos;
+            archivo.get(c);
+            lista_t.tenistas[lista_t.contador] = tenista;
             lista_t.contador++;
         }
-    }else{
-        //TODO: poner mensaje en caso de que no se haya podido abrir el archivo
     }
     archivo.close();
     return ok;
 }
 void guardar(const t_lista_tenistas &lista_t){
-    //TODO: con los tenistas que ya hay cargados que se hace?
     ofstream archivo;
-    archivo.open("tenistas.txt", ofstream::out | ofstream::trunc);  //se haria eso?
+    archivo.open("tenistas.txt", std::ifstream::out | std::ifstream::trunc );
     for(int i = 0; i < lista_t.contador; i++){
         archivo << lista_t.tenistas[i].iniciales << " ";
         archivo << lista_t.tenistas[i].habilidad << " ";
         archivo << lista_t.tenistas[i].velocidad << " ";
         archivo << lista_t.tenistas[i].partidos_ganados << " ";
-        archivo << lista_t.tenistas[i].partidos_perdidos << endl;
+        archivo << lista_t.tenistas[i].partidos_perdidos;
+        if(i != lista_t.contador-1)
+            archivo << endl;
     }
-    cout << "\r\b";
+    if(lista_t.contador == 0)
+        archivo << " ";
     archivo.close();
 }
 int buscar_iniciales(const t_lista_tenistas &lista_t, string iniciales){
@@ -247,10 +258,11 @@ void eliminar_tenista(t_lista_tenistas &lista_t, string iniciales){
     }
 }
 int pedir_tenista(const t_lista_tenistas &lista_t, int num){
-    //TODO: revisar esta funcion
-    int posicion = -1;
+    int posicion;
     string iniciales;
     do{
+        if(posicion == -1)
+            cout << "   No existe ningun tenista con esas inciales" << endl;
         cout << "Introduce las iniciales del tenista " << num << " : ";
         cin >> iniciales;
         posicion = buscar_iniciales(lista_t, iniciales);
@@ -258,39 +270,39 @@ int pedir_tenista(const t_lista_tenistas &lista_t, int num){
     return posicion;
 }
 void seleccionarTop4(const t_lista_tenistas &lista_t, int &ind_t1, int &ind_t2, int &ind_t3, int &ind_t4){
-    int primero = -1, segundo, tercero, cuarto;
-    for(int i = 0; i < TENISTAS.contador; i++){
-        if(TENISTAS.elementos[i].partidos_ganados >= primero){
+    int primero = -1, segundo = -1, tercero = -1, cuarto = -1;
+    for(int i = 0; i < lista_t.contador; i++){
+        if(lista_t.tenistas[i].partidos_ganados >= primero){
             cuarto = tercero;
             tercero = segundo;
             segundo = primero;
-            primero = TENISTAS.elementos[i].partidos_ganados;
+            primero = lista_t.tenistas[i].partidos_ganados;
 
-            indT4 = indT3;
-            indT3 = indT2;
-            indT2 = indT1;
-            indT1 = i;
+            ind_t4 = ind_t3;
+            ind_t3 = ind_t2;
+            ind_t2 = ind_t1;
+            ind_t1 = i;
 
-        }else if(TENISTAS.elementos[i].partidos_ganados >= segundo){
+        }else if(lista_t.tenistas[i].partidos_ganados >= segundo){
             cuarto = tercero;
             tercero = segundo;
-            segundo = TENISTAS.elementos[i].partidos_ganados;
+            segundo = lista_t.tenistas[i].partidos_ganados;
 
-            indT4 = indT3;
-            indT3 = indT2;
-            indT2 = i;
+            ind_t4 = ind_t3;
+            ind_t3 = ind_t2;
+            ind_t2 = i;
 
-        }else if(TENISTAS.elementos[i].partidos_ganados >= tercero){
+        }else if(lista_t.tenistas[i].partidos_ganados >= tercero){
             cuarto = tercero;
-            tercero = TENISTAS.elementos[i].partidos_ganados;
+            tercero = lista_t.tenistas[i].partidos_ganados;
 
-            indT4 = indT3;
-            indT3 = i;
+            ind_t4 = ind_t3;
+            ind_t3 = i;
 
-        }else if(TENISTAS.elementos[i].partidos_ganados >= cuarto){
-            cuarto = TENISTAS.elementos[i].partidos_ganados;
+        }else if(lista_t.tenistas[i].partidos_ganados >= cuarto){
+            cuarto = lista_t.tenistas[i].partidos_ganados;
 
-            indT4 = i;
+            ind_t4 = i;
         }
     }
 }
@@ -310,21 +322,23 @@ int introducir_dato(string dato, int min, int max){
     return dato_i;
 }
 void introducir_tenista(t_lista_tenistas &lista_t){
-    string iniciales;
     if(lista_t.contador < 10){
         lista_t.tenistas[lista_t.contador].iniciales = introducir_iniciales();
         lista_t.tenistas[lista_t.contador].habilidad = introducir_dato("habilidad", MIN_HABILIDAD, MAX_HABILIDAD);
         lista_t.tenistas[lista_t.contador].velocidad = introducir_dato("velocidad", MIN_VELOCIDAD, MAX_VELOCIDAD);
         cout << "Nuevo tenista creado" << endl << endl;
         lista_t.contador++;
+    }else{
+        cout << "Lista de tenistas llena, elimine uno antes de añadir otro" << endl;
     }
 }
 string introducir_iniciales(){
     string iniciales;
     cout << "   >Introduce sus iniciales (3 letras): ";
+    cin >> iniciales;
     while(iniciales.length() != 3){
-        cout << "   >Iniciales de solo 3 caracteres, vuelva a introducirlas: ";
-        cin >> inciales;
+        cout << "Iniciales de solo 3 caracteres, vuelva a introducirlas: ";
+        cin >> iniciales;
     }
     return iniciales;
 }
@@ -455,8 +469,8 @@ void jugar_punto(t_datos_tenista &tenista1, t_datos_tenista &tenista2, t_tenista
         }
     }
 }
-void jugar_juego(t_datos_tenista &tenista1, t_datos_tenista &tenista2, t_tenista servicio_para, t_tenista &ganador_juego){
-    ganador_juego = NADIE;
+void jugar_juego(t_datos_tenista &tenista1, t_datos_tenista &tenista2, t_tenista servicio_para){
+    t_tenista ganador_juego = NADIE;
     t_tenista ganador_punto = NADIE;
     t_puntos_juego puntos1 = NADA, puntos2 = NADA;
 
@@ -485,11 +499,12 @@ void jugar_juego(t_datos_tenista &tenista1, t_datos_tenista &tenista2, t_tenista
     ganador_juego == TENISTA1 ? ganador_juego_s = tenista1.iniciales : ganador_juego_s = tenista2.iniciales;
     cout << endl << "El ganador del juego es " << ganador_juego_s << endl;
 }
-void jugar_partido(t_datos_tenista &tenista1, t_datos_tenista &tenista2, t_tenista& ganador_partido){
+t_tenista jugar_partido(t_datos_tenista &tenista1, t_datos_tenista &tenista2){
+    t_tenista ganador_partido = NADIE;
     t_tenista servicio_para = saque_inicial();
-    t_tenista ganador_partido = NADIE, ganador_juego = NADIE;
+    //TODO: revisar ganador_juego, puede no hacer falta
     while(ganador_partido == NADIE){
-        jugar_juego(tenista1, tenista2, servicio_para, ganador_juego);
+        jugar_juego(tenista1, tenista2, servicio_para);
         servicio_para == TENISTA1 ? servicio_para = TENISTA2 : servicio_para = TENISTA1;
         hay_ganador_set(tenista1.partido.juegos, tenista2.partido.juegos, ganador_partido);
     }
@@ -502,59 +517,46 @@ void jugar_partido(t_datos_tenista &tenista1, t_datos_tenista &tenista2, t_tenis
     }
     pintar_marcador_final(tenista1.iniciales, tenista2.iniciales, tenista1.partido.juegos, tenista2.partido.juegos);
     string nombre_ganador;
-    ganador_set == TENISTA1 ? nombre_ganador = tenista1.iniciales : nombre_ganador = tenista2.iniciales;
+    ganador_partido == TENISTA1 ? nombre_ganador = tenista1.iniciales : nombre_ganador = tenista2.iniciales;
     cout << nombre_ganador << " se hizo con el partido" << endl << endl << "Gracias por jugar" << endl << endl;
+
+    return ganador_partido;
 }
 void jugar_torneo(t_lista_tenistas &lista_t, int ind_t1, int ind_t2, int ind_t3, int ind_t4){
-    t_datos_tenista tenista1, tenista2, tenista3, tenista4, finalista1, finalista2;
-    tenista1 = lista_t.tenistas[ind_t1];
-    tenista2 = lista_t.tenistas[ind_t2];
-    tenista3 = lista_t.tenistas[ind_t2];
-    tenista4 = lista_t.tenistas[ind_t3];
-
+    int fin_t1, fin_t2;
     t_tenista ganador1 = NADIE, ganador2 = NADIE, ganador_torneo = NADIE;
 
-    cout << "* Primera semifinal: " << tenista1.iniciales << " vs " << tenista4.iniciales << " *" << endl;
-    cout << "* Segunda semifinal: " << tenista2.iniciales << " vs " << tenista3.iniciales << " *" << endl << endl;
+    cout << "* Primera semifinal: " << lista_t.tenistas[ind_t1].iniciales << " vs " << lista_t.tenistas[ind_t4].iniciales << " *" << endl;
+    cout << "* Segunda semifinal: " << lista_t.tenistas[ind_t2].iniciales << " vs " << lista_t.tenistas[ind_t3].iniciales << " *" << endl << endl;
     cout << "* COMIENZA EL TORNEO *" << endl << endl;
 
     //PRIMERA SEMIFINAL
-    cout << "* Primera semifinal: " << tenista1.iniciales << " vs " << tenista4.iniciales << " *" << endl;
-    jugar_partido(tenista1, tenista4, ganador1);
-    lista_t.tenistas[ind_t1] = tenista1; //Volvemos a guardar los auxiliares en la lista principal TODO: esta bien asi?
-    lista_t.tenistas[ind_t4] = tenista4;
+    cout << "* Primera semifinal: " << lista_t.tenistas[ind_t1].iniciales << " vs " << lista_t.tenistas[ind_t4].iniciales << " *" << endl;
+    ganador1 = jugar_partido(lista_t.tenistas[ind_t1], lista_t.tenistas[ind_t4]);
     if(ganador1 == TENISTA1)
-        finalista1 = tenista1;
+        fin_t1 = ind_t1;
     else
-        finalista1 = tenista4;
-    cout << "* CAMPEON PRIMERA SEMIFINAL: " << finalista1.iniciales << " *" << endl << endl;
+        fin_t1 = ind_t4;
+    cout << "* CAMPEON PRIMERA SEMIFINAL: " << lista_t.tenistas[fin_t1].iniciales << " *" << endl << endl;
 
     //SEGUNDA SEMIFINAL
-    cout << "* Segunda semifinal: " << tenista2.iniciales << " vs " << tenista3.iniciales << " *" << endl << endl;
-    jugar_partido(tenista2, tenista3, ganador2);
-    lista_t.tenistas[ind_t2] = tenista2; //Volvemos a guardar los auxiliares en la lista principal 
-    lista_t.tenistas[ind_t3] = tenista3;
+    cout << "* Segunda semifinal: " << lista_t.tenistas[ind_t2].iniciales << " vs " << lista_t.tenistas[ind_t3].iniciales << " *" << endl << endl;
+    ganador2 = jugar_partido(lista_t.tenistas[ind_t2], lista_t.tenistas[ind_t3]);
     if(ganador2 == TENISTA1)
-        finalista2 = tenista2;
+        fin_t2 = ind_t2;
     else
-        finalista2 = tenista3;
-    cout << "* CAMPEON SEGUNDA SEMIFINAL: " << finalista2.inciales << " *" << endl << endl;
+        fin_t2 = ind_t3;
+    cout << "* CAMPEON SEGUNDA SEMIFINAL: " << lista_t.tenistas[fin_t2].iniciales << " *" << endl << endl;
 
     //FINAL
     string iniciales_ganador;
-    cout << "* Gran final: " << finalista1.inciales << " vs " << finalista2.iniciales << " *" << endl << endl;
-    jugar_partido(finalista1, finalista2, ganador_torneo);
-
-    int ind_f1, ind_f2;
-    ind_f1 = buscar_iniciales(finalista1.inciales); //TODO: esta parte esta bien asi??
-    ind_f2 = buscar_iniciales(finalista2.iniciales);
-    lista_t.tenistas[ind_f1] = finalista1;
-    lista_t.tenistas[ind_f2] = finalista2;
+    cout << "* Gran final: " << lista_t.tenistas[fin_t1].iniciales << " vs " << lista_t.tenistas[fin_t2].iniciales << " *" << endl << endl;
+    ganador_torneo = jugar_partido(lista_t.tenistas[fin_t1], lista_t.tenistas[fin_t2]);
 
     if(ganador_torneo == TENISTA1)
-        iniciales_ganador = finalista1.inciales;
+        iniciales_ganador = lista_t.tenistas[fin_t1].iniciales;
     else
-        iniciales_ganador = finalista2.iniciales;
+        iniciales_ganador = lista_t.tenistas[fin_t2].iniciales;
     cout << "* CAMPEON DEL TORNEO : " << iniciales_ganador << " *" << endl << endl;
 }
 
@@ -622,7 +624,7 @@ void pintar_peloteo(string nombre1, string nombre2, int pos1, int pos2, t_tenist
 void mostrar(const t_lista_tenistas lista_t){ //Formato tabla
     int caracteres_por_dato = 5;
 
-    cout << endl << setfill(' ') << setw(caracteres_por_dato) << "INI";
+    cout << setfill(' ') << setw(caracteres_por_dato) << "INI";
     cout << setfill(' ') << setw(caracteres_por_dato) << "HAB";
     cout << setfill(' ') << setw(caracteres_por_dato) << "VEL";
     cout << setfill(' ') << setw(caracteres_por_dato) << "PG";
